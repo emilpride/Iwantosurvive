@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Место выживания — Промт семьи</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #222536;
+      --accent: #4f8ef7;
+      --accent2: #7c4dff;
+      --green: #2ecc71;
+      --yellow: #f1c40f;
+      --red: #e74c3c;
+      --text: #e8eaf6;
+      --muted: #8892b0;
+      --border: #2d3250;
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 32px 16px 64px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .header .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .header h1 {
+      font-size: clamp(24px, 5vw, 38px);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #e8eaf6, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header p {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    /* Role block */
+    .role-block {
+      background: linear-gradient(135deg, #1a2040, #1e2850);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .role-block .icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+    .role-block .label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .role-block p { color: var(--text); font-size: 14px; line-height: 1.6; }
+
+    /* Scale block */
+    .scale-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .scale-item {
+      flex: 1;
+      min-width: 200px;
+    }
+    .scale-item .label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .scale-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .scale-bar span { font-size: 12px; color: var(--muted); }
+    .scale-bar .bar {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(to right, var(--red), var(--yellow), var(--green));
+    }
+    .scale-label { font-size: 13px; color: var(--text); line-height: 1.5; }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .card .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .card .card-icon {
+      width: 36px; height: 36px;
+      background: var(--surface2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .card .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .card .card-body {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    /* Family members */
+    .family-grid {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .family-member {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 10px 14px;
+      text-align: center;
+      flex: 1;
+      min-width: 90px;
+    }
+    .family-member .avatar { font-size: 26px; margin-bottom: 4px; }
+    .family-member .name { font-size: 12px; color: var(--muted); }
+    .family-member .age { font-size: 15px; font-weight: 700; color: var(--text); }
+
+    /* Languages */
+    .lang-list { display: flex; flex-direction: column; gap: 8px; }
+    .lang-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .lang-name {
+      width: 80px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+    .lang-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+    .lang-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .level-native { background: #1a3a2a; color: var(--green); border: 1px solid #2ecc7140; }
+    .level-c1     { background: #1a2a3a; color: #4f8ef7; border: 1px solid #4f8ef740; }
+    .level-b2     { background: #1a2535; color: #74b9ff; border: 1px solid #74b9ff40; }
+    .level-b1     { background: #25261a; color: #f1c40f; border: 1px solid #f1c40f40; }
+    .level-a2     { background: #2a2020; color: #e67e22; border: 1px solid #e67e2240; }
+    .level-a1     { background: #2a1a1a; color: #e74c3c; border: 1px solid #e74c3c40; }
+
+    /* Budget */
+    .budget-items { display: flex; flex-direction: column; gap: 10px; }
+    .budget-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+    .budget-row .b-label { font-size: 13px; color: var(--muted); }
+    .budget-row .b-value { font-size: 16px; font-weight: 700; color: var(--green); }
+    .budget-total {
+      margin-top: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, #162a1e, #1d3527);
+      border-radius: 8px;
+      border: 1px solid #2ecc7130;
+    }
+    .budget-total .b-label { font-size: 13px; font-weight: 600; color: var(--text); }
+    .budget-total .b-value { font-size: 18px; font-weight: 800; color: var(--green); }
+
+    /* Tags */
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag {
+      font-size: 12px;
+      padding: 4px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--text);
+    }
+    .tag.highlight {
+      background: #1a2a3a;
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Health */
+    .health-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #2a1e1e;
+      border: 1px solid #e74c3c30;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+    .health-item .dot {
+      width: 8px; height: 8px;
+      background: var(--red);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .health-item span { font-size: 13px; color: #e8a0a0; }
+
+    /* Wide card */
+    .card-wide {
+      grid-column: 1 / -1;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div style="text-align:right;margin-bottom:12px">
+      <a href="compare.html" style="color:var(--accent);font-size:13px;text-decoration:none;font-weight:600;">🗺️ Сравнение стран →</a>
+    </div>
+    <div class="header">
+      <div class="badge">Кризисное планирование</div>
+      <h1>Место выживания</h1>
+      <p>Промт семьи для оценки локаций переезда</p>
+    </div>
+
+    <!-- Role -->
+    <div class="role-block">
+      <div class="icon">🎯</div>
+      <div>
+        <div class="label">Роль оценщика</div>
+        <p>Суровый эксперт по геополитике, кризисному планированию и выживанию (prepping).</p>
+      </div>
+    </div>
+
+    <!-- Scale -->
+    <div class="scale-block">
+      <div class="scale-item">
+        <div class="label">Шкала оценки</div>
+        <p class="scale-label">1 — катастрофа &nbsp;·&nbsp; 10 — идеально</p>
+        <div class="scale-bar">
+          <span>1</span>
+          <div class="bar"></div>
+          <span>10</span>
+        </div>
+      </div>
+      <div class="scale-item">
+        <div class="label">Вес фактора</div>
+        <p class="scale-label">1 — не имеет значения &nbsp;·&nbsp; 10 — вопрос жизни и смерти</p>
+        <div class="scale-bar">
+          <span>1</span>
+          <div class="bar"></div>
+          <span>10</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cards grid -->
+    <div class="grid">
+
+      <!-- Family -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">👨‍👩‍👧‍👦</div>
+          <div class="card-title">Состав семьи</div>
+        </div>
+        <div class="card-body">
+          <div class="family-grid">
+            <div class="family-member">
+              <div class="avatar">👨</div>
+              <div class="age">32</div>
+              <div class="name">Отец</div>
+            </div>
+            <div class="family-member">
+              <div class="avatar">👩</div>
+              <div class="age">29</div>
+              <div class="name">Мать</div>
+            </div>
+            <div class="family-member">
+              <div class="avatar">👦</div>
+              <div class="age">7</div>
+              <div class="name">Сын</div>
+            </div>
+            <div class="family-member">
+              <div class="avatar">👧</div>
+              <div class="age">1</div>
+              <div class="name">Дочь</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Citizenship -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">🇺🇦</div>
+          <div class="card-title">Гражданство</div>
+        </div>
+        <div class="card-body">
+          <div class="tags">
+            <span class="tag highlight">🇺🇦 Украина</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Languages — wide -->
+      <div class="card card-wide">
+        <div class="card-header">
+          <div class="card-icon">🗣️</div>
+          <div class="card-title">Знание языков</div>
+        </div>
+        <div class="card-body">
+          <div class="lang-list">
+
+            <div class="lang-row">
+              <span class="lang-name">🇷🇺 Русский</span>
+              <div class="lang-badges">
+                <span class="lang-badge level-native">Native — все</span>
+              </div>
+            </div>
+
+            <div class="lang-row">
+              <span class="lang-name">🇺🇦 Украинский</span>
+              <div class="lang-badges">
+                <span class="lang-badge level-native">Native — родители</span>
+              </div>
+            </div>
+
+            <div class="lang-row">
+              <span class="lang-name">🇬🇧 Английский</span>
+              <div class="lang-badges">
+                <span class="lang-badge level-c1">C1 — мать</span>
+                <span class="lang-badge level-b2">B2 — отец</span>
+              </div>
+            </div>
+
+            <div class="lang-row">
+              <span class="lang-name">🇹🇷 Турецкий</span>
+              <div class="lang-badges">
+                <span class="lang-badge level-b1">B1 — родители</span>
+              </div>
+            </div>
+
+            <div class="lang-row">
+              <span class="lang-name">🇩🇪 Немецкий</span>
+              <div class="lang-badges">
+                <span class="lang-badge level-b1">B1 — мать</span>
+                <span class="lang-badge level-a2">A2 — отец</span>
+                <span class="lang-badge level-a1">A1 — сын</span>
+              </div>
+            </div>
+
+            <div class="lang-row">
+              <span class="lang-name">🇨🇳 Китайский</span>
+              <div class="lang-badges">
+                <span class="lang-badge level-c1">C1 — мать</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Profession -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">💼</div>
+          <div class="card-title">Профессия</div>
+        </div>
+        <div class="card-body">
+          <div class="tags" style="margin-bottom: 12px;">
+            <span class="tag highlight">Compliance / AML Officer</span>
+            <span class="tag">Крипто-биржи</span>
+            <span class="tag">Senior / Head</span>
+            <span class="tag">8+ лет</span>
+          </div>
+          <div style="background: #2a2015; border: 1px solid #f1c40f30; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #f0d070;">
+            ⚠️ Работает только отец. На данный момент безработный.
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">🌾</div>
+          <div class="card-title">Навыки выживания</div>
+        </div>
+        <div class="card-body">
+          <div class="tags">
+            <span class="tag">🌱 Базовое сельское хозяйство</span>
+            <span class="tag">🐓 Уход за курами</span>
+            <span class="tag">🚗 Вождение (отец)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Budget -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">💰</div>
+          <div class="card-title">Бюджет</div>
+        </div>
+        <div class="card-body">
+          <div class="budget-items">
+            <div class="budget-row">
+              <span class="b-label">Наличные / крипта</span>
+              <span class="b-value">$20 000</span>
+            </div>
+            <div class="budget-row">
+              <span class="b-label">Жильё в Киеве</span>
+              <span class="b-value">~$100 000</span>
+            </div>
+            <div class="budget-total">
+              <span class="b-label">Итого потенциал</span>
+              <span class="b-value">~$120 000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Health -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">🏥</div>
+          <div class="card-title">Здоровье</div>
+        </div>
+        <div class="card-body">
+          <div class="health-item">
+            <div class="dot"></div>
+            <span>Хронический синусит у матери — важен тёплый и сухой климат</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pets -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">🐾</div>
+          <div class="card-title">Питомцы</div>
+        </div>
+        <div class="card-body">
+          <div class="tags">
+            <span class="tag">Сейчас нет</span>
+            <span class="tag highlight">🐕 Планируем собаку</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preferences — wide -->
+      <div class="card card-wide">
+        <div class="card-header">
+          <div class="card-icon">🌊</div>
+          <div class="card-title">Предпочтения к месту</div>
+        </div>
+        <div class="card-body">
+          <div class="tags">
+            <span class="tag highlight">☀️ Тёплый климат</span>
+            <span class="tag highlight">🏖️ Чистое море</span>
+            <span class="tag highlight">🏝️ Хорошие пляжи</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /grid -->
+
+    <div class="footer">
+      Место выживания · Промт семьи · Март 2026 &nbsp;·&nbsp;
+      <a href="compare.html" style="color:var(--accent);text-decoration:none;">🗺️ Сравнение стран →</a>
+    </div>
+
+  </div>
+</body>
+</html>

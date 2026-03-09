@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Сравнение стран — Место выживания</title>
+  <style>
+    :root {
+      --bg: #09111f;
+      --bg2: #0d1830;
+      --surface: rgba(14, 24, 42, 0.88);
+      --surface2: rgba(22, 35, 60, 0.92);
+      --surface3: rgba(49, 69, 106, 0.9);
+      --surface4: rgba(10, 18, 31, 0.78);
+      --accent: #5ea1ff;
+      --accent-soft: #9dc3ff;
+      --gold: #ffd166;
+      --green: #3ddc97;
+      --yellow: #ffd166;
+      --orange: #ff9f43;
+      --red: #ff6b6b;
+      --text: #edf3ff;
+      --muted: #9aabc9;
+      --muted2: #6f84ab;
+      --border: rgba(121, 149, 201, 0.22);
+      --border-strong: rgba(121, 149, 201, 0.36);
+      --shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --col-factor: 280px;
+      --col-weight: 84px;
+      --col-country: 148px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    button, a { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(94,161,255,.18), transparent 26%),
+        radial-gradient(circle at top right, rgba(61,220,151,.12), transparent 24%),
+        linear-gradient(180deg, #0c1730 0%, #09111f 34%, #07101c 100%);
+    }
+    a { color: inherit; }
+
+    .page-header {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 16px 24px;
+      backdrop-filter: blur(18px);
+      background: rgba(7, 14, 27, 0.72);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; min-width: 0; }
+    .nav-link {
+      color: var(--muted); text-decoration: none; font-size: 13px; white-space: nowrap;
+      padding: 9px 12px; border: 1px solid transparent; border-radius: 999px;
+      transition: .18s ease;
+    }
+    .nav-link:hover { color: var(--text); border-color: var(--border); background: rgba(255,255,255,.03); }
+    .page-title-wrap { min-width: 0; }
+    .eyebrow {
+      font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--accent-soft);
+      margin-bottom: 4px;
+    }
+    .page-title { font-size: 26px; font-weight: 900; line-height: 1.05; }
+    .page-subtitle { font-size: 13px; color: var(--muted); margin-top: 5px; }
+
+    .page-shell {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 22px 22px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .prompt-strip {
+      display: grid;
+      grid-template-columns: 1.35fr .85fr;
+      gap: 16px;
+      padding: 18px 20px;
+      background: linear-gradient(180deg, rgba(18,31,55,.96), rgba(10,18,31,.92));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .prompt-main {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
+    .prompt-family {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .prompt-person {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 14px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+    .prompt-person-avatar {
+      font-size: 24px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .prompt-person-age {
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .prompt-person-role {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.35;
+    }
+    .prompt-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .prompt-title-wrap { min-width: 0; }
+    .prompt-title { font-size: 22px; font-weight: 900; line-height: 1.1; }
+    .prompt-copy { font-size: 13px; color: var(--muted); margin-top: 6px; max-width: 70ch; line-height: 1.5; }
+    .prompt-link {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      font-size: 12px;
+      color: var(--accent-soft);
+      white-space: nowrap;
+      background: rgba(255,255,255,.03);
+    }
+    .prompt-link:hover { border-color: var(--border-strong); color: var(--text); }
+    .prompt-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .prompt-metric {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 14px;
+      padding: 12px;
+      min-height: 86px;
+    }
+    .prompt-metric-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: var(--muted);
+    }
+    .prompt-metric-value {
+      font-size: 22px;
+      font-weight: 900;
+      margin-top: 8px;
+      line-height: 1;
+    }
+    .prompt-metric-copy {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+    .prompt-side {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      align-content: start;
+    }
+    .prompt-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+    .prompt-card-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .prompt-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .prompt-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      font-size: 12px;
+      color: var(--text);
+    }
+    .prompt-chip strong { color: var(--accent-soft); }
+    .model-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 14px 18px;
+      background: linear-gradient(180deg, rgba(17,28,49,.94), rgba(10,18,31,.92));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .model-strip-copy { display: flex; flex-direction: column; gap: 6px; }
+    .model-strip-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--muted);
+    }
+    .model-strip-text {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.45;
+    }
+    .model-toggle {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .model-btn {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .16s ease;
+      font-family: inherit;
+    }
+    .model-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+    .model-btn.active {
+      background: rgba(94,161,255,.15);
+      border-color: var(--accent);
+      color: var(--text);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(360px, 1.1fr) minmax(340px, 1fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+    .hero-card,
+    .panel,
+    .matrix-panel {
+      background: linear-gradient(180deg, rgba(16,27,48,.92), rgba(9,17,31,.94));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+    }
+    .hero-card {
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      min-height: 280px;
+    }
+    .hero-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(94,161,255,.14), transparent 38%, rgba(61,220,151,.08));
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 18px; height: 100%; }
+    .hero-kicker {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 12px; border-radius: 999px; width: fit-content;
+      background: rgba(255,255,255,.05); border: 1px solid var(--border);
+      font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent-soft);
+    }
+    .hero-grid-main {
+      display: grid;
+      grid-template-columns: 1.25fr .95fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .hero-lead { display: flex; flex-direction: column; gap: 10px; }
+    .hero-title { font-size: clamp(30px, 5vw, 46px); font-weight: 900; line-height: .95; }
+    .hero-score-line { display: flex; align-items: end; gap: 10px; flex-wrap: wrap; }
+    .hero-score { font-size: clamp(42px, 8vw, 72px); font-weight: 900; line-height: .9; }
+    .hero-meta { color: var(--muted); font-size: 13px; line-height: 1.5; max-width: 52ch; }
+    .hero-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .mini-tag {
+      padding: 8px 10px; border-radius: 999px; border: 1px solid var(--border);
+      background: rgba(255,255,255,.03); color: var(--text); font-size: 12px;
+    }
+    .hero-delta {
+      padding: 16px; border-radius: 16px; background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06); display: flex; flex-direction: column; gap: 12px;
+    }
+    .hero-delta-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; }
+    .hero-delta-value { font-size: 30px; font-weight: 900; }
+    .hero-delta-copy { font-size: 13px; color: var(--muted); line-height: 1.45; }
+
+    .country-rail {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      align-content: start;
+      padding: 20px;
+    }
+    .country-card {
+      position: relative;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      overflow: hidden;
+      min-height: 138px;
+    }
+    .country-card::after {
+      content: '';
+      position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+      background: var(--country-color, var(--accent));
+      opacity: .95;
+    }
+    .country-card.top-country {
+      border-color: color-mix(in srgb, var(--country-color, var(--gold)) 58%, rgba(255,255,255,.18));
+      background: linear-gradient(180deg, rgba(255,209,102,.09), rgba(255,255,255,.03));
+    }
+    .country-rank { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+    .country-name { font-size: 18px; font-weight: 800; margin-top: 8px; line-height: 1.15; }
+    .country-score { font-size: 34px; font-weight: 900; margin-top: 10px; line-height: 1; color: var(--country-color, var(--accent)); }
+    .country-sub { margin-top: 8px; color: var(--muted); font-size: 12px; }
+    .country-bar-bg { margin-top: 12px; height: 6px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; }
+    .country-bar { height: 100%; border-radius: 999px; background: var(--country-color, var(--accent)); }
+    .country-label,
+    .country-name-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .flag-icon {
+      width: 20px;
+      height: 15px;
+      border-radius: 4px;
+      object-fit: cover;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.12);
+      flex: 0 0 auto;
+      vertical-align: middle;
+    }
+    .flag-icon.sm {
+      width: 16px;
+      height: 12px;
+      border-radius: 3px;
+    }
+    .flag-icon.lg {
+      width: 24px;
+      height: 18px;
+      border-radius: 5px;
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, .9fr) 1.5fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .panel { padding: 20px; }
+    .panel-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1.3px; color: var(--muted); margin-bottom: 12px; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 108px;
+    }
+    .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.1px; }
+    .stat-value { font-size: 30px; font-weight: 900; line-height: 1; margin-top: 8px; }
+    .stat-copy { font-size: 12px; color: var(--muted); line-height: 1.45; margin-top: 8px; }
+
+    .filter-layout { display: flex; flex-direction: column; gap: 18px; }
+    .legend-card {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .legend-block {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.05);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .legend-block-title {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .legend-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      font-size: 12px;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .legend-ring {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+      flex: 0 0 auto;
+    }
+    .legend-help {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .filter-row {
+      display: flex; flex-wrap: wrap; gap: 12px;
+      align-items: start;
+    }
+    .filter-block {
+      flex: 1;
+      min-width: 220px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .filter-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+    }
+    .filter-inline { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .filter-min-val { color: var(--text); font-size: 13px; }
+    .filter-pills { display: flex; gap: 7px; flex-wrap: wrap; }
+    .fpill {
+      padding: 8px 12px; border-radius: 999px; border: 1px solid var(--border);
+      font-size: 12px; font-weight: 700; cursor: pointer; background: rgba(255,255,255,.03);
+      color: var(--muted); transition: .18s ease; white-space: nowrap; user-select: none;
+    }
+    .fpill:hover { border-color: var(--border-strong); color: var(--text); transform: translateY(-1px); }
+    .fpill.active {
+      background: color-mix(in srgb, var(--pill-color, var(--accent)) 18%, rgba(255,255,255,.05));
+      border-color: var(--pill-color, var(--accent));
+      color: var(--pill-color, var(--text));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .filter-range { width: min(220px, 100%); accent-color: var(--accent); cursor: pointer; }
+    .filter-search {
+      width: min(320px, 100%);
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 14px;
+      padding: 10px 12px;
+      font-family: inherit;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .filter-search:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,.06); }
+    .filter-search::placeholder { color: var(--muted2); }
+    .toggle-group { display: inline-flex; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .tgl-btn {
+      padding: 10px 14px; font-size: 13px; font-weight: 700; background: transparent;
+      border: none; color: var(--muted); cursor: pointer; font-family: inherit; transition: .15s ease;
+    }
+    .tgl-btn.active { background: var(--accent); color: #fff; }
+    .tgl-btn:not(.active):hover { background: rgba(255,255,255,.04); color: var(--text); }
+    .filter-copy { color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 14px;
+    }
+    .group-card {
+      background: linear-gradient(180deg, rgba(17,28,49,.94), rgba(10,18,31,.92));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .group-head { display: flex; align-items: start; justify-content: space-between; gap: 10px; }
+    .group-name { font-size: 15px; font-weight: 800; line-height: 1.2; }
+    .group-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .group-top { margin-top: 14px; display: flex; align-items: end; justify-content: space-between; gap: 12px; }
+    .group-country { font-size: 14px; font-weight: 700; }
+    .group-score { font-size: 30px; font-weight: 900; line-height: 1; }
+    .group-list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .group-row {
+      display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center;
+      font-size: 12px; color: var(--muted);
+    }
+    .group-row strong { color: var(--text); font-weight: 700; }
+    .group-bar-bg { height: 6px; border-radius: 999px; background: rgba(255,255,255,.06); overflow: hidden; }
+    .group-bar { height: 100%; border-radius: 999px; background: var(--accent); }
+
+    .matrix-panel { overflow: hidden; }
+    .matrix-head {
+      display: flex; justify-content: space-between; align-items: start; gap: 16px; flex-wrap: wrap;
+      padding: 20px 22px 16px; border-bottom: 1px solid var(--border);
+    }
+    .matrix-title { font-size: 22px; font-weight: 900; line-height: 1.1; }
+    .matrix-copy { font-size: 13px; color: var(--muted); margin-top: 6px; max-width: 62ch; line-height: 1.5; }
+    .matrix-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+    .meta-chip {
+      padding: 8px 10px; border-radius: 999px; background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06); color: var(--muted); font-size: 12px;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      overflow-y: visible;
+      background: linear-gradient(180deg, rgba(11,18,31,.95), rgba(8,14,24,.98));
+    }
+    table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 640px; }
+    thead { position: sticky; top: 0; z-index: 100; }
+    th, td { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 0; vertical-align: middle; }
+    th:first-child, td:first-child { border-left: 1px solid var(--border); }
+    .col-factor {
+      min-width: var(--col-factor); max-width: var(--col-factor);
+      position: sticky; left: 0; z-index: 20; background: rgba(10,18,31,.98);
+    }
+    .col-weight {
+      min-width: var(--col-weight); max-width: var(--col-weight);
+      position: sticky; left: var(--col-factor); z-index: 20; background: rgba(10,18,31,.98);
+      text-align: center;
+    }
+    thead .col-factor, thead .col-weight { z-index: 110; background: rgba(13,24,48,.98); }
+    .col-country { min-width: var(--col-country); text-align: center; background: transparent; }
+    .th-factor-cell,
+    .th-weight-cell {
+      padding: 14px 12px; font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 1.1px; color: var(--muted);
+    }
+    .th-weight-cell { text-align: center; }
+    .th-country-wrap {
+      padding: 12px 10px;
+      display: flex; flex-direction: column; gap: 6px; align-items: center;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
+    }
+    .th-cname-static {
+      font-size: 14px; font-weight: 800; text-align: center; line-height: 1.15;
+      white-space: normal; max-width: 120px;
+    }
+    .th-ctotal { font-size: 20px; font-weight: 900; }
+    .row-group td {
+      background: rgba(18,31,55,.98);
+      padding: 9px 12px;
+      font-size: 11px; font-weight: 800; letter-spacing: .9px;
+      text-transform: uppercase; color: var(--accent-soft);
+    }
+    .group-row-inner { display: flex; align-items: center; gap: 8px; }
+    .row-factor td { background: rgba(9,17,31,.86); }
+    .row-factor:hover td { background: rgba(19,32,56,.96); }
+    .cell-fname { padding: 12px 14px; font-size: 13px; color: var(--text); line-height: 1.45; }
+    .cell-weight { padding: 8px 6px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .w-badge {
+      width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900;
+    }
+    .w-sub { font-size: 10px; color: var(--muted2); letter-spacing: .4px; }
+    .sc-inner { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px 8px; }
+    .sc-val { font-size: 18px; font-weight: 900; line-height: 1; }
+    .sc-sub { font-size: 10px; color: var(--muted2); }
+    .sc-bar-bg { width: 86%; height: 5px; background: rgba(255,255,255,.08); border-radius: 999px; overflow: hidden; }
+    .sc-bar { height: 100%; border-radius: 999px; transition: width .25s ease; }
+    .sc-desc {
+      font-size: 11px; color: var(--muted); line-height: 1.35; text-align: center;
+      padding: 0 4px 2px; max-width: 128px;
+      display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .sc-details {
+      width: 100%;
+      margin-top: 2px;
+    }
+    .sc-details summary {
+      list-style: none;
+    }
+    .sc-details summary::-webkit-details-marker {
+      display: none;
+    }
+    .sc-more {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      font-size: 10px;
+      color: var(--accent-soft);
+      cursor: pointer;
+      user-select: none;
+    }
+    .sc-more:hover {
+      border-color: rgba(255,255,255,.16);
+      color: var(--text);
+    }
+    .sc-details[open] .sc-more {
+      color: var(--text);
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.05);
+    }
+    .sc-desc-full {
+      margin-top: 8px;
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      font-size: 11px;
+      color: var(--text);
+      line-height: 1.45;
+      text-align: left;
+      max-width: 100%;
+    }
+    .sc-0 { color: var(--muted); }
+    .sc-lo { color: var(--red); }
+    .sc-md { color: var(--orange); }
+    .sc-hi { color: var(--yellow); }
+    .sc-vhi { color: var(--green); }
+    .bar-lo { background: var(--red); }
+    .bar-md { background: var(--orange); }
+    .bar-hi { background: var(--yellow); }
+    .bar-vhi { background: var(--green); }
+    .row-total td { background: rgba(13,24,48,.98); border-top: 2px solid rgba(255,255,255,.08); }
+    .total-label {
+      padding: 14px 12px; font-size: 11px; font-weight: 800; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .total-score { font-size: 18px; font-weight: 900; text-align: center; padding: 10px 6px; }
+
+    footer {
+      text-align: center; color: var(--muted); font-size: 12px; padding: 12px 0 6px;
+    }
+    footer a { color: var(--accent-soft); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,.03); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.16); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.22); }
+
+    @media (max-width: 1120px) {
+      .prompt-strip,
+      .hero-grid,
+      .control-grid,
+      .hero-grid-main { grid-template-columns: 1fr; }
+      .country-rail { padding-top: 0; }
+    }
+    @media (max-width: 820px) {
+      :root {
+        --col-factor: 200px;
+        --col-weight: 66px;
+        --col-country: 118px;
+      }
+      .page-header { padding: 12px 16px; gap: 10px; }
+      .page-title { font-size: 20px; }
+      .page-subtitle { font-size: 12px; }
+      .page-shell { padding: 14px; gap: 14px; }
+      .hero-card,
+      .panel { padding: 16px; }
+      .prompt-family { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .model-strip { padding: 14px 16px; }
+      .country-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 16px; gap: 10px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .prompt-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .matrix-head { padding: 16px 16px 12px; }
+      .table-wrap { max-height: none; }
+      .fpill { padding: 10px 14px; min-height: 40px; }
+      .model-btn { min-height: 44px; }
+      .overview-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      :root {
+        --col-factor: 155px;
+        --col-weight: 54px;
+        --col-country: 98px;
+      }
+      .header-left { align-items: flex-start; flex-direction: column; gap: 6px; }
+      .page-title { font-size: 17px; }
+      .page-subtitle { display: none; }
+      .eyebrow { display: none; }
+      .page-shell { padding: 10px; gap: 10px; }
+      .prompt-strip { padding: 14px; gap: 12px; }
+      .prompt-family { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .prompt-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .model-toggle { width: 100%; flex-wrap: wrap; gap: 6px; }
+      .model-btn { flex: 1; min-width: 90px; padding: 12px 8px; font-size: 12px; min-height: 44px; }
+      .country-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 12px; gap: 10px; }
+      .country-score { font-size: 28px; }
+      .filter-block { min-width: 100%; }
+      .filter-pills { gap: 6px; }
+      .fpill { padding: 11px 12px; min-height: 42px; font-size: 11px; }
+      .filter-search, .filter-range { width: 100%; }
+      .hero-card, .panel { padding: 14px; }
+      .hero-title { font-size: 26px; }
+      .hero-score { font-size: 40px; }
+      .stat-value { font-size: 26px; }
+      .matrix-title { font-size: 16px; }
+      .matrix-head { padding: 14px; }
+      .th-cname-static { font-size: 12px; max-width: 85px; }
+      .th-ctotal { font-size: 16px; }
+      .sc-val { font-size: 15px; }
+      .sc-desc { font-size: 10px; max-width: 88px; }
+      .cell-fname { font-size: 12px; padding: 10px 10px; }
+      .w-badge { width: 32px; height: 32px; font-size: 11px; }
+      table { min-width: 470px; }
+      .overview-grid { grid-template-columns: 1fr; }
+      .group-score { font-size: 24px; }
+      .hero-delta-value { font-size: 24px; }
+      .prompt-title { font-size: 18px; }
+      .meta-chip { font-size: 11px; padding: 7px 9px; }
+    }
+    @media (max-width: 400px) {
+      :root {
+        --col-factor: 128px;
+        --col-weight: 48px;
+        --col-country: 84px;
+      }
+      .page-header { padding: 10px 12px; }
+      .page-shell { padding: 8px; gap: 8px; }
+      .prompt-strip { padding: 12px; }
+      .country-rail { grid-template-columns: 1fr; padding: 10px; gap: 8px; }
+      .country-score { font-size: 24px; }
+      .hero-title { font-size: 22px; }
+      .hero-score { font-size: 34px; }
+      .th-cname-static { font-size: 11px; max-width: 72px; }
+      .th-ctotal { font-size: 13px; }
+      .sc-val { font-size: 13px; }
+      .sc-desc { display: none; }
+      .cell-fname { font-size: 11px; padding: 8px 8px; }
+      .w-badge { width: 28px; height: 28px; font-size: 10px; }
+      table { min-width: 400px; }
+      .model-btn { font-size: 11px; padding: 10px 6px; }
+      .prompt-family { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-left">
+    <a href="index.html" class="nav-link">← Полный промт</a>
+    <div class="page-title-wrap">
+      <div class="eyebrow">Решение по релокации</div>
+      <div class="page-title">Сравнение стран выживания</div>
+      <div class="page-subtitle">Промт семьи и сравнение стран теперь собраны на одном экране: сначала вводные, затем вывод и полный разбор факторов.</div>
+    </div>
+  </div>
+</header>
+
+<main class="page-shell">
+  <section class="prompt-strip">
+    <div class="prompt-main">
+      <div class="prompt-head">
+        <div class="prompt-title-wrap">
+          <div class="eyebrow">Входные данные</div>
+          <div class="prompt-title">Промт семьи</div>
+          <div class="prompt-copy">Семья из 4 человек с украинским гражданством, бюджетом около $120k и фокусом на тёплый безопасный климат, понятную легализацию и потенциал для устойчивой жизни в кризисе.</div>
+        </div>
+        <a href="index.html" class="prompt-link">Открыть полный промт</a>
+      </div>
+      <div class="prompt-family">
+        <div class="prompt-person">
+          <div class="prompt-person-avatar">👨</div>
+          <div class="prompt-person-age">32</div>
+          <div class="prompt-person-role">Отец · Compliance / AML</div>
+        </div>
+        <div class="prompt-person">
+          <div class="prompt-person-avatar">👩</div>
+          <div class="prompt-person-age">29</div>
+          <div class="prompt-person-role">Мать · нужен тёплый сухой климат</div>
+        </div>
+        <div class="prompt-person">
+          <div class="prompt-person-avatar">👦</div>
+          <div class="prompt-person-age">7</div>
+          <div class="prompt-person-role">Сын</div>
+        </div>
+        <div class="prompt-person">
+          <div class="prompt-person-avatar">👧</div>
+          <div class="prompt-person-age">1</div>
+          <div class="prompt-person-role">Дочь</div>
+        </div>
+      </div>
+      <div class="prompt-metrics">
+        <div class="prompt-metric">
+          <div class="prompt-metric-label">Состав</div>
+          <div class="prompt-metric-value">4 человека</div>
+          <div class="prompt-metric-copy">Отец 32, мать 29, сын 7, дочь 1.</div>
+        </div>
+        <div class="prompt-metric">
+          <div class="prompt-metric-label">Бюджет</div>
+          <div class="prompt-metric-value">~$120k</div>
+          <div class="prompt-metric-copy">$20k ликвидно + жильё в Киеве около $100k.</div>
+        </div>
+        <div class="prompt-metric">
+          <div class="prompt-metric-label">Работа</div>
+          <div class="prompt-metric-value">Compliance / AML</div>
+          <div class="prompt-metric-copy">Отец: senior/head, 8+ лет, сейчас без работы.</div>
+        </div>
+        <div class="prompt-metric">
+          <div class="prompt-metric-label">Климат</div>
+          <div class="prompt-metric-value">Тёплый и сухой</div>
+          <div class="prompt-metric-copy">Из-за хронического синусита у матери.</div>
+        </div>
+      </div>
+    </div>
+    <div class="prompt-side">
+      <div class="prompt-card">
+        <div class="prompt-card-title">Базовые вводные</div>
+        <div class="prompt-list">
+          <span class="prompt-chip">Гражданство: Украина</span>
+          <span class="prompt-chip">1 источник дохода</span>
+          <span class="prompt-chip">Нужна понятная легализация</span>
+        </div>
+      </div>
+      <div class="prompt-card">
+        <div class="prompt-card-title">Языки</div>
+        <div class="prompt-list">
+          <span class="prompt-chip"><strong>RU</strong> Native</span>
+          <span class="prompt-chip"><strong>UA</strong> Native</span>
+          <span class="prompt-chip"><strong>EN</strong> C1/B2</span>
+          <span class="prompt-chip"><strong>TR</strong> B1</span>
+          <span class="prompt-chip"><strong>DE</strong> B1/A2/A1</span>
+          <span class="prompt-chip"><strong>ZH</strong> C1</span>
+        </div>
+      </div>
+      <div class="prompt-card">
+        <div class="prompt-card-title">Навыки и быт</div>
+        <div class="prompt-list">
+          <span class="prompt-chip">Базовое сельское хозяйство</span>
+          <span class="prompt-chip">Уход за курами</span>
+          <span class="prompt-chip">Вождение</span>
+          <span class="prompt-chip">Планируется собака</span>
+        </div>
+      </div>
+      <div class="prompt-card">
+        <div class="prompt-card-title">Предпочтения</div>
+        <div class="prompt-list">
+          <span class="prompt-chip">Тёплый климат</span>
+          <span class="prompt-chip">Чистое море</span>
+          <span class="prompt-chip">Хорошие пляжи</span>
+          <span class="prompt-chip">Безопасность и легализация</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="model-strip">
+    <div class="model-strip-copy">
+      <div class="model-strip-title">Глобальная модель расчёта</div>
+      <div id="modelStripText" class="model-strip-text">Сейчас все блоки ниже считают веса, баллы, лидерство и итоги по среднему значению.</div>
+    </div>
+    <div class="model-toggle">
+      <button class="model-btn active" id="mdlAvg">Среднее</button>
+      <button class="model-btn" id="mdlGpt">GPT 5.4</button>
+      <button class="model-btn" id="mdlGemini">Gemini 3.1 Pro</button>
+      <button class="model-btn" id="mdlClaude">Claude</button>
+    </div>
+  </section>
+
+  <section class="hero-grid">
+    <section id="heroSummary" class="hero-card"></section>
+    <section id="countryRail" class="panel country-rail"></section>
+  </section>
+
+  <section class="control-grid">
+    <section id="quickStats" class="panel"></section>
+    <section class="panel filter-layout">
+      <div>
+        <div class="panel-title">Управление обзором</div>
+        <div class="filter-copy">Оставьте на экране только те страны и группы, которые реально участвуют в выборе. Детализация переключает вид с «итога» на расклад по GPT, Gemini и Claude.</div>
+      </div>
+      <div class="legend-card">
+        <div class="panel-title" style="margin-bottom:0;">Как читать цвета</div>
+        <div class="legend-grid">
+          <div class="legend-block">
+            <div class="legend-block-title">Цвет оценки страны</div>
+            <div class="legend-row">
+              <div class="legend-pill"><span class="legend-dot" style="background:var(--red)"></span><span><strong>Красный</strong> — плохо, слабое место</span></div>
+              <div class="legend-pill"><span class="legend-dot" style="background:var(--orange)"></span><span><strong>Оранжевый</strong> — ниже среднего</span></div>
+              <div class="legend-pill"><span class="legend-dot" style="background:var(--yellow)"></span><span><strong>Жёлтый</strong> — нормально / хорошо</span></div>
+              <div class="legend-pill"><span class="legend-dot" style="background:var(--green)"></span><span><strong>Зелёный</strong> — очень хорошо</span></div>
+            </div>
+          </div>
+          <div class="legend-block">
+            <div class="legend-block-title">Цвет веса фактора</div>
+            <div class="legend-row">
+              <div class="legend-pill" style="color:var(--muted)"><span class="legend-ring"></span><span>Серый круг — фактор мало важен</span></div>
+              <div class="legend-pill" style="color:var(--yellow)"><span class="legend-ring"></span><span>Жёлтый — важен</span></div>
+              <div class="legend-pill" style="color:var(--orange)"><span class="legend-ring"></span><span>Оранжевый — очень важен</span></div>
+              <div class="legend-pill" style="color:var(--red)"><span class="legend-ring"></span><span>Красный круг — критичный фактор</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="legend-help">Важно: <strong style="color:var(--green)">зелёный</strong> в ячейках оценки всегда лучше, а <strong style="color:var(--red)">красный</strong> в оценке всегда хуже. Но у кружка <strong style="color:var(--red)">веса фактора</strong> красный означает не “плохо”, а “это очень важный критерий”.</div>
+      </div>
+      <div class="filter-row">
+        <div class="filter-block">
+          <div class="filter-label">Страны в сравнении</div>
+          <div id="fCountries" class="filter-pills"></div>
+        </div>
+        <div class="filter-block">
+          <div class="filter-label">Группы факторов</div>
+          <div id="fGroups" class="filter-pills"></div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section>
+    <div class="panel-title" style="margin: 0 0 12px 2px;">Картина по блокам факторов</div>
+    <div id="groupOverview" class="overview-grid"></div>
+  </section>
+
+  <section class="matrix-panel">
+    <div class="matrix-head">
+      <div>
+        <div class="matrix-title">Матрица факторов</div>
+          <div class="matrix-copy">Таблица ниже нужна уже для разбора причин. В оценках зелёный лучше, красный хуже. У веса фактора наоборот: красный круг означает максимальную важность критерия.</div>
+      </div>
+      <div id="matrixMeta" class="matrix-meta"></div>
+    </div>
+    <div class="table-wrap">
+      <table id="tbl"></table>
+    </div>
+  </section>
+
+  <footer>Место выживания · Промт семьи + сравнение стран · Март 2026 · <a href="index.html">Полный промт</a></footer>
+</main>
+
+<script>
+// ═══════════════════════════════ DATA MODEL ═══════════════════════════════
+const GROUPS = [
+  {
+    id:'geo', icon:'⚔️', name:'Геополитика и военные риски', sub:'Шанс избежать удара',
+    items:[
+      {id:'dist',     name:'Удаление от событий/конфликтов'},
+      {id:'neutral',  name:'Нейтралитет'},
+      {id:'targets',  name:'Стратегические/военные цели (стать мишенью)'},
+      {id:'barriers', name:'Географические барьеры (защита от вторжения и беженцев)'},
+      {id:'wind',     name:'Роза ветров / перенос радиации'},
+    ]
+  },
+  {
+    id:'res', icon:'🌾', name:'Ресурсы и автономность', sub:'Выживание при коллапсе',
+    items:[
+      {id:'food',    name:'Продовольственная безопасность'},
+      {id:'water',   name:'Водная безопасность'},
+      {id:'energy',  name:'Энергетическая независимость'},
+      {id:'industry',name:'Базовая индустриализация (способность производить необходимое)'},
+      {id:'autoinfra',name:'Автономность инфраструктуры'},
+    ]
+  },
+  {
+    id:'climate', icon:'☀️', name:'Климат', sub:'',
+    items:[
+      {id:'survcond',  name:'Условия выживания при кризисе (возможность вести хозяйство)'},
+      {id:'shelter',   name:'Возможность и стоимость покупки убежища (земля или бункер)'},
+    ]
+  },
+  {
+    id:'legal', icon:'🛂', name:'Легализация и адаптация', sub:'Доступность переезда',
+    items:[
+      {id:'vnzh',      name:'Получение ВНЖ'},
+      {id:'citizen',   name:'Получение гражданства'},
+      {id:'rights',    name:'Права (частная собственность и свободы)'},
+      {id:'foreigners',name:'Отношение к иностранцам'},
+      {id:'english',   name:'Английский язык (распространённость)'},
+      {id:'russian',   name:'Русский язык (комьюнити / понимание)'},
+    ]
+  },
+  {
+    id:'society', icon:'🏙️', name:'Общество и экономика', sub:'Жизнь до часа «Х» и безопасность',
+    items:[
+      {id:'cohesion', name:'Социальная сплочённость (риск гражданской войны при кризисе)'},
+      {id:'crime',    name:'Уровень криминала'},
+      {id:'infra',    name:'Инфраструктура (дороги, связь, логистика в мирное время)'},
+      {id:'jobs',     name:'Работа (рынок труда)'},
+      {id:'rent',     name:'Аренда (доступность жилья)'},
+      {id:'prices',   name:'Цены на продукты'},
+      {id:'medicine', name:'Уровень медицины'},
+      {id:'edu',      name:'Образование'},
+    ]
+  }
+];
+const ALL_FACTORS = GROUPS.flatMap(g => g.items);
+const COLORS = [
+  '#4f8ef7','#2ecc71','#e67e22','#9b59b6','#e74c3c','#1abc9c',
+  '#f39c12','#c0392b','#8e44ad','#16a085','#d35400','#2980b9','#27ae60','#7f8c8d'
+];
+const COUNTRY_CODES = {
+  1:'tr', 2:'ae', 3:'my', 4:'pt', 5:'ge', 6:'cy',
+  7:'es', 8:'vn', 9:'pt', 10:'es', 11:'al', 12:'si', 13:'ie', 14:'nz'
+};
+const MODEL_LABELS = { avg:'среднему', gpt:'GPT 5.4', gemini:'Gemini 3.1 Pro', claude:'Claude' };
+const FACTOR_IDS = ALL_FACTORS.map(f => f.id);
+const GPT54_WEIGHTS = {
+  dist: 9,
+  neutral: 8,
+  targets: 9,
+  barriers: 7,
+  wind: 6,
+  food: 9,
+  water: 8,
+  energy: 7,
+  industry: 5,
+  autoinfra: 6,
+  survcond: 9,
+  shelter: 7,
+  vnzh: 8,
+  citizen: 7,
+  rights: 9,
+  foreigners: 7,
+  english: 7,
+  russian: 4,
+  cohesion: 8,
+  crime: 8,
+  infra: 6,
+  jobs: 7,
+  rent: 6,
+  prices: 6,
+  medicine: 8,
+  edu: 8,
+};
+const GPT54_COUNTRY_SCORES = {
+  1: [5, 5, 5, 6, 7, 8, 6, 6, 7, 7, 8, 8, 8, 5, 4, 7, 5, 8, 5, 7, 7, 7, 8, 8, 6, 6],
+  2: [8, 7, 4, 4, 6, 3, 2, 7, 5, 6, 2, 6, 8, 1, 3, 8, 10, 7, 8, 9, 10, 9, 3, 4, 8, 7],
+  3: [9, 8, 9, 9, 8, 8, 9, 7, 7, 7, 6, 7, 7, 3, 6, 7, 8, 2, 7, 6, 7, 7, 8, 9, 7, 7],
+  4: [8, 6, 7, 8, 7, 7, 6, 8, 6, 7, 9, 7, 7, 8, 9, 9, 7, 3, 8, 8, 7, 6, 5, 7, 8, 8],
+  5: [4, 5, 6, 6, 7, 7, 8, 6, 5, 6, 8, 9, 9, 5, 5, 8, 5, 9, 5, 8, 6, 4, 9, 9, 5, 6],
+  6: [6, 6, 6, 8, 6, 5, 4, 5, 4, 6, 9, 7, 8, 7, 8, 9, 10, 9, 7, 8, 7, 7, 5, 6, 8, 8],
+  7: [8, 5, 6, 8, 7, 8, 6, 8, 7, 8, 8, 7, 8, 6, 9, 8, 6, 3, 7, 8, 8, 6, 6, 7, 8, 8],
+  8: [9, 8, 9, 8, 8, 9, 8, 6, 7, 6, 5, 7, 4, 2, 3, 7, 4, 2, 7, 6, 6, 4, 9, 9, 5, 5],
+  9: [9, 6, 8, 10, 8, 6, 7, 6, 4, 6, 10, 7, 8, 8, 9, 9, 7, 2, 9, 9, 7, 6, 6, 7, 7, 7],
+  10: [9, 5, 8, 10, 8, 6, 4, 6, 4, 7, 10, 7, 8, 6, 9, 9, 8, 3, 8, 8, 7, 5, 7, 8, 8, 7],
+  11: [7, 7, 7, 7, 7, 7, 7, 7, 4, 5, 8, 8, 8, 4, 6, 7, 6, 1, 6, 6, 5, 4, 9, 9, 4, 5],
+  12: [7, 6, 7, 8, 7, 7, 9, 7, 7, 8, 7, 7, 7, 7, 9, 7, 7, 2, 8, 9, 8, 6, 6, 6, 8, 8],
+  13: [9, 8, 8, 9, 8, 7, 9, 6, 7, 7, 4, 4, 7, 6, 9, 8, 10, 1, 8, 8, 7, 8, 3, 4, 8, 9],
+  14: [10, 9, 10, 10, 10, 9, 9, 9, 6, 7, 8, 6, 6, 6, 9, 8, 10, 1, 8, 8, 7, 5, 4, 4, 8, 9],
+};
+
+function applyGpt54Seed(state) {
+  let changed = false;
+
+  Object.entries(GPT54_WEIGHTS).forEach(([factorId, value]) => {
+    const weight = state.weights[factorId] || (state.weights[factorId] = {gpt:0, gemini:0, claude:0});
+    if (weight.gpt !== value) {
+      weight.gpt = value;
+      changed = true;
+    }
+  });
+
+  Object.entries(GPT54_COUNTRY_SCORES).forEach(([countryId, values]) => {
+    FACTOR_IDS.forEach((factorId, index) => {
+      const key = `${countryId}_${factorId}`;
+      const score = state.scores[key];
+      if (!score) return;
+      const value = values[index];
+      if (typeof value !== 'number') return;
+      if (score.gpt !== value) {
+        score.gpt = value;
+        changed = true;
+      }
+    });
+  });
+
+  return changed;
+}
+
+const GEMINI31_WEIGHTS = {
+  dist: 10, neutral: 8, targets: 9, barriers: 8, wind: 7, food: 8, water: 9, energy: 7, 
+  industry: 5, autoinfra: 6, survcond: 9, shelter: 7, vnzh: 8, citizen: 8, rights: 8, 
+  foreigners: 7, english: 8, russian: 5, cohesion: 7, crime: 8, infra: 7, jobs: 6, 
+  rent: 6, prices: 7, medicine: 8, edu: 7
+};
+
+const GEMINI31_COUNTRY_SCORES = {
+  1: [5,6,6,5,6,9,6,6,8,7,7,7,8,6,4,6,4,9,5,6,7,6,8,7,7,5],
+  2: [7,7,4,3,6,2,2,8,4,7,2,6,9,1,3,9,9,8,8,9,10,9,3,4,8,8],
+  3: [8,8,8,8,8,8,9,7,8,6,6,8,7,3,6,8,8,2,7,7,7,6,8,9,7,6],
+  4: [9,7,7,8,8,8,6,8,6,7,9,7,7,8,9,9,7,5,8,9,7,5,5,6,8,8],
+  5: [4,4,6,6,7,7,8,5,4,6,7,9,9,5,5,8,4,9,6,8,5,4,8,8,5,5],
+  6: [6,6,7,8,7,5,4,5,4,7,9,6,9,7,8,8,9,9,6,8,7,6,6,5,8,7],
+  7: [8,6,6,7,7,9,6,8,7,9,8,7,7,6,9,8,6,4,7,8,9,5,6,6,9,8],
+  8: [9,8,9,8,8,9,8,6,7,5,5,7,5,1,3,7,5,2,7,7,6,4,9,9,4,4],
+  9: [9,7,8,10,9,7,6,6,4,5,10,7,7,8,9,9,8,3,9,9,6,5,6,6,7,7],
+  10: [9,6,8,10,9,6,5,6,4,6,10,7,7,6,9,9,8,3,8,8,6,5,6,7,8,7],
+  11: [7,7,7,7,7,8,8,7,5,5,8,8,8,4,6,8,5,2,6,6,5,3,9,9,4,4],
+  12: [8,7,8,8,8,8,10,7,8,8,8,7,7,7,9,7,8,3,9,9,8,5,6,6,9,8],
+  13: [9,8,8,9,8,8,10,6,8,7,4,4,8,7,10,8,10,2,8,8,8,7,3,3,8,9],
+  14: [10,9,10,10,10,10,10,9,6,7,8,6,6,6,10,9,10,2,9,9,8,4,4,3,9,9],
+};
+
+function applyGemini31Seed(state) {
+  let changed = false;
+
+  Object.entries(GEMINI31_WEIGHTS).forEach(([factorId, value]) => {
+    const weight = state.weights[factorId] || (state.weights[factorId] = {gpt:0, gemini:0, claude:0});
+    if (weight.gemini !== value) {
+      weight.gemini = value;
+      changed = true;
+    }
+  });
+
+  Object.entries(GEMINI31_COUNTRY_SCORES).forEach(([countryId, values]) => {
+    FACTOR_IDS.forEach((factorId, index) => {
+      const key = `${countryId}_${factorId}`;
+      const score = state.scores[key];
+      if (!score) return;
+      const value = values[index];
+      if (typeof value !== 'number') return;
+      if (score.gemini !== value) {
+        score.gemini = value;
+        changed = true;
+      }
+    });
+  });
+
+  return changed;
+}
+
+// ═══════════════════════════════ STATE ════════════════════════════════════
+let detailMode = false;
+let activeModel = 'avg';
+const filter = { countries: new Set(), groups: new Set(GROUPS.map(g => g.id)), minScore: 0, search: '' };
+
+function defaultState() {
+  return {
+    countries:[
+      {id:1, name:'🇹🇷 Турция',     color:COLORS[0]},
+      {id:2, name:'🇦🇪 ОАЭ (Дубай)', color:COLORS[1]},
+      {id:3, name:'🇲🇾 Малайзия',   color:COLORS[2]},
+      {id:4, name:'🇵🇹 Португалия', color:COLORS[3]},
+      {id:5, name:'🇬🇪 Грузия',     color:COLORS[4]},
+      {id:6,  name:'🇨🇾 Кипр',              color:COLORS[5]},
+      {id:7,  name:'🇪🇸 Испания',           color:COLORS[6]},
+      {id:8,  name:'🇻🇳 Вьетнам',            color:COLORS[7]},
+      {id:9,  name:'🇵🇹 Мадейра',            color:COLORS[8]},
+      {id:10, name:'🇪🇸 Канары',             color:COLORS[9]},
+      {id:11, name:'🇦🇱 Албания',            color:COLORS[10]},
+      {id:12, name:'🇸🇮 Словения',           color:COLORS[11]},
+      {id:13, name:'🇮🇪 Ирландия',           color:COLORS[12]},
+      {id:14, name:'🇳🇿 Новая Зеландия',     color:COLORS[13]},
+    ],
+    nextId: 15,
+    weights: {
+      dist:      {gpt:0,gemini:0,claude:9},
+      neutral:   {gpt:0,gemini:0,claude:8},
+      targets:   {gpt:0,gemini:0,claude:9},
+      barriers:  {gpt:0,gemini:0,claude:7},
+      wind:      {gpt:0,gemini:0,claude:6},
+      food:      {gpt:0,gemini:0,claude:9},
+      water:     {gpt:0,gemini:0,claude:8},
+      energy:    {gpt:0,gemini:0,claude:7},
+      industry:  {gpt:0,gemini:0,claude:6},
+      autoinfra: {gpt:0,gemini:0,claude:7},
+      survcond:  {gpt:0,gemini:0,claude:8},
+      shelter:   {gpt:0,gemini:0,claude:7},
+      vnzh:      {gpt:0,gemini:0,claude:8},
+      citizen:   {gpt:0,gemini:0,claude:7},
+      rights:    {gpt:0,gemini:0,claude:8},
+      foreigners:{gpt:0,gemini:0,claude:7},
+      english:   {gpt:0,gemini:0,claude:6},
+      russian:   {gpt:0,gemini:0,claude:5},
+      cohesion:  {gpt:0,gemini:0,claude:8},
+      crime:     {gpt:0,gemini:0,claude:7},
+      infra:     {gpt:0,gemini:0,claude:6},
+      jobs:      {gpt:0,gemini:0,claude:8},
+      rent:      {gpt:0,gemini:0,claude:6},
+      prices:    {gpt:0,gemini:0,claude:6},
+      medicine:  {gpt:0,gemini:0,claude:7},
+      edu:       {gpt:0,gemini:0,claude:6},
+    },
+    scores: {
+      // 🇹🇷 Турция
+      '1_dist':      {gpt:0,gemini:0,claude:5,desc:'Рядом с Сирией, Ираком; логистический узел НАТО'},
+      '1_neutral':   {gpt:0,gemini:0,claude:5,desc:'Формально НАТО, но активно балансирует между блоками'},
+      '1_targets':   {gpt:0,gemini:0,claude:6,desc:'Не приоритетная ядерная цель, но коридор НАТО'},
+      '1_barriers':  {gpt:0,gemini:0,claude:6,desc:'Горы Тавр, проливы — серьёзные естественные барьеры'},
+      '1_wind':      {gpt:0,gemini:0,claude:7,desc:'Преобладают западные ветра, далеко от восточных очагов'},
+      '1_food':      {gpt:0,gemini:0,claude:8,desc:'Одна из ведущих агро-держав, зерно, овощи, мясо'},
+      '1_water':     {gpt:0,gemini:0,claude:6,desc:'Реки есть, но юго-восток засушлив'},
+      '1_energy':    {gpt:0,gemini:0,claude:6,desc:'АЭС строится, ВИЭ растёт, но газ импортирует'},
+      '1_industry':  {gpt:0,gemini:0,claude:7,desc:'Развитая промышленность: авто, текстиль, оборонка'},
+      '1_autoinfra': {gpt:0,gemini:0,claude:7,desc:'Хорошая инфраструктура, особенно на западе'},
+      '1_survcond':  {gpt:0,gemini:0,claude:8,desc:'Средиземноморский климат, земледелие круглый год'},
+      '1_shelter':   {gpt:0,gemini:0,claude:8,desc:'Дешёвая земля во внутренних районах'},
+      '1_vnzh':      {gpt:0,gemini:0,claude:8,desc:'Туристическая резиденция через аренду — быстро и просто'},
+      '1_citizen':   {gpt:0,gemini:0,claude:5,desc:'5 лет или инвестиции от $400k'},
+      '1_rights':    {gpt:0,gemini:0,claude:5,desc:'Снижение свободы прессы и независимости судов при Эрдогане'},
+      '1_foreigners':{gpt:0,gemini:0,claude:7,desc:'В целом гостеприимны, украинцев принимают хорошо'},
+      '1_english':   {gpt:0,gemini:0,claude:5,desc:'Туристические зоны — окей, глубинка — нет'},
+      '1_russian':   {gpt:0,gemini:0,claude:8,desc:'Огромная русскоязычная диаспора после 2022'},
+      '1_cohesion':  {gpt:0,gemini:0,claude:6,desc:'Политическая поляризация, курдский вопрос'},
+      '1_crime':     {gpt:0,gemini:0,claude:7,desc:'Относительно низкий уровень криминала'},
+      '1_infra':     {gpt:0,gemini:0,claude:7,desc:'Хорошие дороги, интернет, логистика'},
+      '1_jobs':      {gpt:0,gemini:0,claude:7,desc:'Стамбул — крупный крипто/AML хаб региона'},
+      '1_rent':      {gpt:0,gemini:0,claude:8,desc:'Аланья/Анталья: $800–1400/мес у моря'},
+      '1_prices':    {gpt:0,gemini:0,claude:8,desc:'Выгодно для держателей USD/EUR при инфляции лиры'},
+      '1_medicine':  {gpt:0,gemini:0,claude:6,desc:'Хорошая частная медицина по доступным ценам'},
+      '1_edu':       {gpt:0,gemini:0,claude:6,desc:'Международные школы есть, качество варьируется'},
+      // 🇦🇪 ОАЭ (Дубай)
+      '2_dist':      {gpt:0,gemini:0,claude:8,desc:'Далеко от европейских конфликтов'},
+      '2_neutral':   {gpt:0,gemini:0,claude:7,desc:'Авраамские соглашения, активный нейтральный дипломат'},
+      '2_targets':   {gpt:0,gemini:0,claude:5,desc:'Нефтяная инфраструктура — высокоценная цель для противника'},
+      '2_barriers':  {gpt:0,gemini:0,claude:4,desc:'Пустыня вокруг, нестабильный ближневосточный регион'},
+      '2_wind':      {gpt:0,gemini:0,claude:6,desc:'Преобладающие северо-западные ветра'},
+      '2_food':      {gpt:0,gemini:0,claude:3,desc:'Практически 100% импорт — критическая уязвимость при коллапсе'},
+      '2_water':     {gpt:0,gemini:0,claude:3,desc:'Тотальная зависимость от опреснения — катастрофа без энергии'},
+      '2_energy':    {gpt:0,gemini:0,claude:7,desc:'Собственная нефть и газ, но системы уязвимы'},
+      '2_industry':  {gpt:0,gemini:0,claude:5,desc:'Финансовый хаб, мало реального производства'},
+      '2_autoinfra': {gpt:0,gemini:0,claude:6,desc:'Зависит от экспатов и постоянного импорта'},
+      '2_survcond':  {gpt:0,gemini:0,claude:3,desc:'Пустыня, 45°C летом — жить без кондиционера невозможно'},
+      '2_shelter':   {gpt:0,gemini:0,claude:6,desc:'Freehold-недвижимость доступна для иностранцев'},
+      '2_vnzh':      {gpt:0,gemini:0,claude:8,desc:'Рабочая виза легко при наличии оффера'},
+      '2_citizen':   {gpt:0,gemini:0,claude:2,desc:'Практически невозможно для не-арабов'},
+      '2_rights':    {gpt:0,gemini:0,claude:4,desc:'Нет политических свобод, жёсткие ограничения личных прав'},
+      '2_foreigners':{gpt:0,gemini:0,claude:8,desc:'90% населения — экспаты, система полностью заточена под них'},
+      '2_english':   {gpt:0,gemini:0,claude:9,desc:'Де-факто официальный язык бизнеса и службы'},
+      '2_russian':   {gpt:0,gemini:0,claude:7,desc:'Большая русскоязычная диаспора'},
+      '2_cohesion':  {gpt:0,gemini:0,claude:8,desc:'Авторитарная стабильность'},
+      '2_crime':     {gpt:0,gemini:0,claude:9,desc:'Один из безопаснейших городов мира'},
+      '2_infra':     {gpt:0,gemini:0,claude:10,desc:'Инфраструктура мирового класса'},
+      '2_jobs':      {gpt:0,gemini:0,claude:9,desc:'Лучший в мире рынок для Compliance/AML в крипто'},
+      '2_rent':      {gpt:0,gemini:0,claude:4,desc:'Очень дорого для семьи без источника дохода'},
+      '2_prices':    {gpt:0,gemini:0,claude:5,desc:'Дорогой город, особенно рестораны и досуг'},
+      '2_medicine':  {gpt:0,gemini:0,claude:8,desc:'Отличная частная медицина'},
+      '2_edu':       {gpt:0,gemini:0,claude:7,desc:'Много хороших международных школ'},
+      // 🇲🇾 Малайзия
+      '3_dist':      {gpt:0,gemini:0,claude:9,desc:'ЮВА — максимально далеко от всех основных конфликтов'},
+      '3_neutral':   {gpt:0,gemini:0,claude:8,desc:'АСЕАН, традиционный внеблоковый нейтралитет'},
+      '3_targets':   {gpt:0,gemini:0,claude:9,desc:'Крайне маловероятная цель для любой стороны'},
+      '3_barriers':  {gpt:0,gemini:0,claude:9,desc:'Океанские барьеры, джунгли — лучшая защита'},
+      '3_wind':      {gpt:0,gemini:0,claude:8,desc:'Очень далеко от зон ядерных ударов'},
+      '3_food':      {gpt:0,gemini:0,claude:8,desc:'Тропическое изобилие: рис, пальмовое масло, фрукты'},
+      '3_water':     {gpt:0,gemini:0,claude:9,desc:'Тропические ливни, реки — нет проблем с водой'},
+      '3_energy':    {gpt:0,gemini:0,claude:7,desc:'Собственные нефть и газ (Petronas)'},
+      '3_industry':  {gpt:0,gemini:0,claude:7,desc:'Производство, электроника, нефтехимия'},
+      '3_autoinfra': {gpt:0,gemini:0,claude:7,desc:'Хорошая инфраструктура в городах'},
+      '3_survcond':  {gpt:0,gemini:0,claude:7,desc:'Тропик хорош для земледелия, но высокая влажность при синусите'},
+      '3_shelter':   {gpt:0,gemini:0,claude:7,desc:'Земля доступна за пределами городов'},
+      '3_vnzh':      {gpt:0,gemini:0,claude:7,desc:'MM2H-программа, есть альтернативные пути'},
+      '3_citizen':   {gpt:0,gemini:0,claude:3,desc:'Крайне сложно, 10+ лет + жёсткие требования'},
+      '3_rights':    {gpt:0,gemini:0,claude:6,desc:'Приличная защита собственности, некоторые ограничения'},
+      '3_foreigners':{gpt:0,gemini:0,claude:7,desc:'Традиционно приветливы, особенно в Пенанге'},
+      '3_english':   {gpt:0,gemini:0,claude:8,desc:'Очень широкое распространение, второй язык'},
+      '3_russian':   {gpt:0,gemini:0,claude:3,desc:'Очень маленькая диаспора'},
+      '3_cohesion':  {gpt:0,gemini:0,claude:7,desc:'Мультиэтническая, в целом стабильная'},
+      '3_crime':     {gpt:0,gemini:0,claude:6,desc:'Умеренный уровень, карманные кражи'},
+      '3_infra':     {gpt:0,gemini:0,claude:7,desc:'Хорошо в городах, слабее в сельской местности'},
+      '3_jobs':      {gpt:0,gemini:0,claude:7,desc:'Растущий финтех-хаб, китайский C1 жены — сильный козырь'},
+      '3_rent':      {gpt:0,gemini:0,claude:8,desc:'Очень доступно: $800–1200/мес комфортное жильё'},
+      '3_prices':    {gpt:0,gemini:0,claude:9,desc:'Один из самых дешёвых регионов мира'},
+      '3_medicine':  {gpt:0,gemini:0,claude:7,desc:'Отличная медицина по ценам ниже западных'},
+      '3_edu':       {gpt:0,gemini:0,claude:7,desc:'Хорошие международные школы с английским'},
+      // 🇵🇹 Португалия
+      '4_dist':      {gpt:0,gemini:0,claude:8,desc:'Самый западный угол Европы — максимальная дистанция от востока'},
+      '4_neutral':   {gpt:0,gemini:0,claude:6,desc:'НАТО, но самый периферийный член, далеко от фронтира'},
+      '4_targets':   {gpt:0,gemini:0,claude:7,desc:'Член НАТО — риск, но не приоритетная цель, нет ключевых баз'},
+      '4_barriers':  {gpt:0,gemini:0,claude:8,desc:'Атлантика, Иберийский полуостров — естественная изоляция'},
+      '4_wind':      {gpt:0,gemini:0,claude:7,desc:'Атлантические ветра с запада — радиация идёт в другую сторону'},
+      '4_food':      {gpt:0,gemini:0,claude:7,desc:'Развитое сельское хозяйство, рыболовство'},
+      '4_water':     {gpt:0,gemini:0,claude:6,desc:'Засухи на юге (Алгарве) — потенциальная проблема'},
+      '4_energy':    {gpt:0,gemini:0,claude:7,desc:'Сильная возобновляемая энергетика: ветер, солнце, гидро'},
+      '4_industry':  {gpt:0,gemini:0,claude:6,desc:'Средняя промышленная база'},
+      '4_autoinfra': {gpt:0,gemini:0,claude:7,desc:'Хорошая инфраструктура, стандарт ЕС'},
+      '4_survcond':  {gpt:0,gemini:0,claude:8,desc:'Сухой тёплый климат — отлично для синусита жены'},
+      '4_shelter':   {gpt:0,gemini:0,claude:7,desc:'Доступно в сельской местности и малых городах'},
+      '4_vnzh':      {gpt:0,gemini:0,claude:7,desc:'D7/Nomad Visa — управляемый процесс'},
+      '4_citizen':   {gpt:0,gemini:0,claude:8,desc:'5 лет + португальский = паспорт ЕС. Меняет всё'},
+      '4_rights':    {gpt:0,gemini:0,claude:9,desc:'Верховенство права, полные права ЕС, CoE'},
+      '4_foreigners':{gpt:0,gemini:0,claude:9,desc:'Один из самых дружелюбных народов Европы'},
+      '4_english':   {gpt:0,gemini:0,claude:7,desc:'Широко в городах и туристических районах'},
+      '4_russian':   {gpt:0,gemini:0,claude:4,desc:'Небольшая, но растущая диаспора'},
+      '4_cohesion':  {gpt:0,gemini:0,claude:8,desc:'Очень стабильное общество, низкая политическая напряжённость'},
+      '4_crime':     {gpt:0,gemini:0,claude:8,desc:'Очень безопасная страна'},
+      '4_infra':     {gpt:0,gemini:0,claude:7,desc:'Хорошая инфраструктура'},
+      '4_jobs':      {gpt:0,gemini:0,claude:6,desc:'Небольшой крипто-рынок, удалённая работа — норма'},
+      '4_rent':      {gpt:0,gemini:0,claude:6,desc:'Лиссабон дорог, Алгарве — умеренно: $1200–1800/мес'},
+      '4_prices':    {gpt:0,gemini:0,claude:7,desc:'Умеренные цены, заметно дешевле Северной Европы'},
+      '4_medicine':  {gpt:0,gemini:0,claude:8,desc:'Хорошая система здравоохранения ЕС'},
+      '4_edu':       {gpt:0,gemini:0,claude:8,desc:'Хорошие школы, дипломы ЕС, международные программы'},
+      // 🇬🇪 Грузия
+      '5_dist':      {gpt:0,gemini:0,claude:5,desc:'Граничит с Россией, оккупированные С. Осетия и Абхазия'},
+      '5_neutral':   {gpt:0,gemini:0,claude:5,desc:'Хочет в ЕС/НАТО, но политически слабая позиция'},
+      '5_targets':   {gpt:0,gemini:0,claude:7,desc:'Не стратегическая цель, но близость к России — риск'},
+      '5_barriers':  {gpt:0,gemini:0,claude:6,desc:'Кавказские горы — хороший барьер с севера'},
+      '5_wind':      {gpt:0,gemini:0,claude:7,desc:'Вдали от основных ядерных целей'},
+      '5_food':      {gpt:0,gemini:0,claude:7,desc:'Плодородная земля, вино, овощи, орехи'},
+      '5_water':     {gpt:0,gemini:0,claude:8,desc:'Обильные водные ресурсы, реки, горные источники'},
+      '5_energy':    {gpt:0,gemini:0,claude:6,desc:'Гидроэнергетика своя, но газ импортирует'},
+      '5_industry':  {gpt:0,gemini:0,claude:5,desc:'Ограниченная промышленная база'},
+      '5_autoinfra': {gpt:0,gemini:0,claude:6,desc:'Тбилиси хорошо, регионы подтягиваются'},
+      '5_survcond':  {gpt:0,gemini:0,claude:8,desc:'Разнообразный климат, Батуми тёплый, земля плодородная'},
+      '5_shelter':   {gpt:0,gemini:0,claude:9,desc:'Очень дешёвая земля и недвижимость по меркам мира'},
+      '5_vnzh':      {gpt:0,gemini:0,claude:9,desc:'Украинцы: 1 год без визы + продление — лучший вариант сейчас'},
+      '5_citizen':   {gpt:0,gemini:0,claude:5,desc:'5 лет легального проживания'},
+      '5_rights':    {gpt:0,gemini:0,claude:6,desc:'Есть, но демократические тенденции ухудшаются'},
+      '5_foreigners':{gpt:0,gemini:0,claude:8,desc:'Очень тепло принимают, украинцы — особенно'},
+      '5_english':   {gpt:0,gemini:0,claude:5,desc:'За пределами Тбилиси ограниченно'},
+      '5_russian':   {gpt:0,gemini:0,claude:9,desc:'Широко понимают и говорят, несмотря на политику'},
+      '5_cohesion':  {gpt:0,gemini:0,claude:6,desc:'Внутренние разногласия по курсу страны'},
+      '5_crime':     {gpt:0,gemini:0,claude:8,desc:'Очень безопасная страна'},
+      '5_infra':     {gpt:0,gemini:0,claude:6,desc:'Тбилиси хорошо, регионы отстают'},
+      '5_jobs':      {gpt:0,gemini:0,claude:5,desc:'Маленький рынок труда, низкие зарплаты'},
+      '5_rent':      {gpt:0,gemini:0,claude:9,desc:'Батуми: $400–700/мес комфортная квартира'},
+      '5_prices':    {gpt:0,gemini:0,claude:9,desc:'Один из самых дешёвых вариантов Европы/СНГ'},
+      '5_medicine':  {gpt:0,gemini:0,claude:5,desc:'Улучшается, но базовый уровень, не хватает специалистов'},
+      '5_edu':       {gpt:0,gemini:0,claude:6,desc:'Достаточный уровень, есть несколько международных школ'},
+      // 🇨🇾 Кипр
+      '6_dist':      {gpt:0,gemini:0,claude:6,desc:'Восточное Средиземноморье, близко к Сирии/Ливану'},
+      '6_neutral':   {gpt:0,gemini:0,claude:6,desc:'ЕС, но не НАТО — лучший нейтральный статус в ЕС'},
+      '6_targets':   {gpt:0,gemini:0,claude:7,desc:'Британские военные базы — небольшой риск'},
+      '6_barriers':  {gpt:0,gemini:0,claude:8,desc:'Остров — лучший из возможных естественных барьеров'},
+      '6_wind':      {gpt:0,gemini:0,claude:6,desc:'Средиземноморские ветра, умеренный риск'},
+      '6_food':      {gpt:0,gemini:0,claude:6,desc:'Ограниченное сельское хозяйство, много импорта'},
+      '6_water':     {gpt:0,gemini:0,claude:5,desc:'Хронический дефицит воды, зависимость от опреснения'},
+      '6_energy':    {gpt:0,gemini:0,claude:5,desc:'Зависит от импорта, своё газовое месторождение пока недоразработано'},
+      '6_industry':  {gpt:0,gemini:0,claude:5,desc:'Туризм и финансы, минимум реального производства'},
+      '6_autoinfra': {gpt:0,gemini:0,claude:6,desc:'Хорошо для острова, но ограничения масштаба'},
+      '6_survcond':  {gpt:0,gemini:0,claude:8,desc:'Сухой тёплый климат — идеален при хроническом синусите'},
+      '6_shelter':   {gpt:0,gemini:0,claude:7,desc:'ЕС стандарты защиты собственности, цены умеренные'},
+      '6_vnzh':      {gpt:0,gemini:0,claude:8,desc:'ЕС + Pink Slip и иные программы для не-ЕС'},
+      '6_citizen':   {gpt:0,gemini:0,claude:7,desc:'5 лет = паспорт ЕС — отличная перспектива'},
+      '6_rights':    {gpt:0,gemini:0,claude:8,desc:'Полные права ЕС, Совет Европы, независимые суды'},
+      '6_foreigners':{gpt:0,gemini:0,claude:9,desc:'~40% населения — иностранцы, открытейшее общество'},
+      '6_english':   {gpt:0,gemini:0,claude:9,desc:'Де-факто второй язык, везде и всегда'},
+      '6_russian':   {gpt:0,gemini:0,claude:9,desc:'Огромная русскоязычная диаспора в Лимасоле'},
+      '6_cohesion':  {gpt:0,gemini:0,claude:7,desc:'Стабильно, хотя остров политически разделён'},
+      '6_crime':     {gpt:0,gemini:0,claude:8,desc:'Очень безопасно, низкий уровень уличного криминала'},
+      '6_infra':     {gpt:0,gemini:0,claude:7,desc:'Хорошая для острова инфраструктура'},
+      '6_jobs':      {gpt:0,gemini:0,claude:7,desc:'Лимасол — крупный крипто-хаб в юрисдикции ЕС'},
+      '6_rent':      {gpt:0,gemini:0,claude:6,desc:'Умеренно, но растёт из-за спроса диаспоры'},
+      '6_prices':    {gpt:0,gemini:0,claude:6,desc:'Умеренные, чуть выше Португалии'},
+      '6_medicine':  {gpt:0,gemini:0,claude:8,desc:'Стандарт ЕС, хорошая частная медицина'},
+      '6_edu':       {gpt:0,gemini:0,claude:8,desc:'Отличные английские школы, дипломы ЕС'},
+      // 🇪🇸 Испания
+      '7_dist':      {gpt:0,gemini:0,claude:8,desc:'Западная Европа, максимально далеко от восточного фронтира'},
+      '7_neutral':   {gpt:0,gemini:0,claude:5,desc:'Активный член НАТО, испанские базы США; политически давление есть'},
+      '7_targets':   {gpt:0,gemini:0,claude:6,desc:'НАТО-член, базы США (Рота, Морон); не первая цель, но риск есть'},
+      '7_barriers':  {gpt:0,gemini:0,claude:8,desc:'Пиренеи, Атлантика и Средиземноморье — сильная естественная изоляция'},
+      '7_wind':      {gpt:0,gemini:0,claude:7,desc:'Атлантические ветра с запада / юго-запада; континент защищён горами'},
+      '7_food':      {gpt:0,gemini:0,claude:8,desc:'Один из крупнейших агро-экспортёров ЕС: фрукты, вино, оливки, зерно'},
+      '7_water':     {gpt:0,gemini:0,claude:6,desc:'Засухи на юге и Месете — нарастающая проблема; зелёный Север в порядке'},
+      '7_energy':    {gpt:0,gemini:0,claude:7,desc:'Мощная сеть ВИЭ: ветер, солнце, гидро; ~50% уже возобновляемые'},
+      '7_industry':  {gpt:0,gemini:0,claude:7,desc:'Автопром, авиастроение (Airbus), агро, химия — диверсифицированная база'},
+      '7_autoinfra': {gpt:0,gemini:0,claude:7,desc:'Отличные дороги, крупнейшая в мире сеть ВСМ, порты'},
+      '7_survcond':  {gpt:0,gemini:0,claude:7,desc:'Средиземноморский климат хорош при синусите; юг жаркий и сухой летом'},
+      '7_shelter':   {gpt:0,gemini:0,claude:7,desc:'Провинция и малые города доступны; Мадрид/Барселона дорогие'},
+      '7_vnzh':      {gpt:0,gemini:0,claude:8,desc:'Digital Nomad Visa, Non-Lucrative Visa — рабочие пути без работодателя'},
+      '7_citizen':   {gpt:0,gemini:0,claude:6,desc:'10 лет легального проживания → паспорт ЕС; длинно, но реально'},
+      '7_rights':    {gpt:0,gemini:0,claude:9,desc:'Полные права ЕС, Совет Европы, сильная независимость судов'},
+      '7_foreigners':{gpt:0,gemini:0,claude:8,desc:'Открытая культура, многолетний опыт приёма экспатов и туристов'},
+      '7_english':   {gpt:0,gemini:0,claude:6,desc:'Крупные города — нормально; провинция слабее; молодёжь улучшается'},
+      '7_russian':   {gpt:0,gemini:0,claude:4,desc:'Небольшая диаспора; с 2022 выросла, но ниже Кипра/Грузии'},
+      '7_cohesion':  {gpt:0,gemini:0,claude:7,desc:'Каталонский вопрос создаёт напряжение; в целом стабильная страна'},
+      '7_crime':     {gpt:0,gemini:0,claude:8,desc:'Низкий уровень насилия; карманные кражи в туристических зонах'},
+      '7_infra':     {gpt:0,gemini:0,claude:8,desc:'Отличная инфраструктура — одна из лучших ВСМ-сетей Европы'},
+      '7_jobs':      {gpt:0,gemini:0,claude:6,desc:'Небольшой, но растущий крипто/финтех-рынок; удалённая работа — норма'},
+      '7_rent':      {gpt:0,gemini:0,claude:7,desc:'Провинция: €900–1400/мес; Валенсия/Севилья умеренные; столицы дорого'},
+      '7_prices':    {gpt:0,gemini:0,claude:7,desc:'Умеренно: дешевле Франции/Германии, чуть дороже Португалии'},
+      '7_medicine':  {gpt:0,gemini:0,claude:8,desc:'Одна из лучших систем здравоохранения мира (ВОЗ топ-7)'},
+      '7_edu':       {gpt:0,gemini:0,claude:8,desc:'Хорошие государственные и международные школы, дипломы ЕС'},
+      // 🇻🇳 Вьетнам
+      '8_dist':      {gpt:0,gemini:0,claude:9,desc:'ЮВА — максимально далеко от всех основных конфликтов северного полушария'},
+      '8_neutral':   {gpt:0,gemini:0,claude:8,desc:'Активная независимая дипломатия «бамбукового суверенитета» — с обоими блоками'},
+      '8_targets':   {gpt:0,gemini:0,claude:9,desc:'Нет стратегических ядерных объектов, не входит ни в один военный блок'},
+      '8_barriers':  {gpt:0,gemini:0,claude:8,desc:'Горы Чыонгшон на западе, Южно-Китайское море — хорошие барьеры'},
+      '8_wind':      {gpt:0,gemini:0,claude:8,desc:'Тропики, очень далеко от любых ядерных точек — радиационный риск минимален'},
+      '8_food':      {gpt:0,gemini:0,claude:9,desc:'Крупнейший экспортёр риса и кофе; тропическое с/х, море, круглый год'},
+      '8_water':     {gpt:0,gemini:0,claude:8,desc:'Дельта Меконга, реки, дожди — водные ресурсы в изобилии (кроме засух в ЦВ)'},
+      '8_energy':    {gpt:0,gemini:0,claude:6,desc:'ГЭС + уголь; зависит от импорта нефти; солнечная энергетика быстро растёт'},
+      '8_industry':  {gpt:0,gemini:0,claude:7,desc:'«Фабрика мира» следующего уровня: электроника Samsung, Nike, текстиль'},
+      '8_autoinfra': {gpt:0,gemini:0,claude:6,desc:'Развивается стремительно, но ещё неравномерно — с/х районы отстают'},
+      '8_survcond':  {gpt:0,gemini:0,claude:6,desc:'Тропик: плодородно, но высокая влажность — не идеал при синусите жены'},
+      '8_shelter':   {gpt:0,gemini:0,claude:7,desc:'Дешёвая недвижимость вне городов; иностранцы не могут владеть, только аренда'},
+      '8_vnzh':      {gpt:0,gemini:0,claude:5,desc:'E-visa 90 дней; долгосрочная виза и ВНЖ без чёткой Digital Nomad программы'},
+      '8_citizen':   {gpt:0,gemini:0,claude:2,desc:'Практически закрыто для иностранцев, исключения единичные'},
+      '8_rights':    {gpt:0,gemini:0,claude:4,desc:'Однопартийное государство; имущественные права OK, политические — ограничены'},
+      '8_foreigners':{gpt:0,gemini:0,claude:7,desc:'В целом дружелюбны к западным экспатам; отношение варьируется по регионам'},
+      '8_english':   {gpt:0,gemini:0,claude:5,desc:'Дананг/Хошимин/Ханой — приемлемо; провинция — только вьетнамский'},
+      '8_russian':   {gpt:0,gemini:0,claude:3,desc:'Советская история есть, но диаспора мала; старшее поколение помнит'},
+      '8_cohesion':  {gpt:0,gemini:0,claude:7,desc:'Стабильная однопартийная система; политическая предсказуемость высокая'},
+      '8_crime':     {gpt:0,gemini:0,claude:7,desc:'Насильственные преступления редки; мелкое мошенничество vs туристов'},
+      '8_infra':     {gpt:0,gemini:0,claude:6,desc:'Быстро строит дороги, интернет неплохой; регионы значительно слабее'},
+      '8_jobs':      {gpt:0,gemini:0,claude:5,desc:'Крипто-рынок небольшой; удалённая работа в юридической серой зоне'},
+      '8_rent':      {gpt:0,gemini:0,claude:9,desc:'Дананг/Хойан: $500–800/мес комфортная квартира, у пляжа'},
+      '8_prices':    {gpt:0,gemini:0,claude:9,desc:'Один из самых дешёвых регионов мира; уличная еда на $2–3/день'},
+      '8_medicine':  {gpt:0,gemini:0,claude:5,desc:'Улучшается; для серьёзного лечения лучше Бангкок; страховка обязательна'},
+      '8_edu':       {gpt:0,gemini:0,claude:5,desc:'Международные школы в мегаполисах есть, но дорогие для экспата'},
+      // 🇵🇹 Мадейра (автономный регион Португалии)
+      '9_dist':      {gpt:0,gemini:0,claude:9,desc:'Атлантический остров — максимальная изоляция от европейских конфликтов'},
+      '9_neutral':   {gpt:0,gemini:0,claude:6,desc:'Часть Португалии/НАТО, но самая периферийная точка — фактически вне зоны'},
+      '9_targets':   {gpt:0,gemini:0,claude:8,desc:'Нет военной инфраструктуры, нет стратегических объектов, очень высокая безопасность'},
+      '9_barriers':  {gpt:0,gemini:0,claude:10,desc:'Остров в центре Атлантики — идеальный природный барьер от любых угроз'},
+      '9_wind':      {gpt:0,gemini:0,claude:8,desc:'Пассаты, атлантика — любые выбросы уйдут на восток, к материку'},
+      '9_food':      {gpt:0,gemini:0,claude:7,desc:'Богатое тропическое земледелие + рыболовство; часть продовольствия импортируется'},
+      '9_water':     {gpt:0,gemini:0,claude:7,desc:'Горные источники, «левады» — ирригационная система 500 лет; ограниченный объём'},
+      '9_energy':    {gpt:0,gemini:0,claude:7,desc:'Гидро + ветер + солнце; ~60% возобновляемой; остаток — мазут с материка'},
+      '9_industry':  {gpt:0,gemini:0,claude:4,desc:'Туризм и лёгкое с/х; практически нет промышленного производства'},
+      '9_autoinfra': {gpt:0,gemini:0,claude:6,desc:'Хорошая дорожная сеть для острова; паромы важны; доступность ограничена'},
+      '9_survcond':  {gpt:0,gemini:0,claude:9,desc:'Субтропический климат 22–26°C круглый год — идеал при хроническом синусите'},
+      '9_shelter':   {gpt:0,gemini:0,claude:7,desc:'Дешевле Лиссабона; сельские районы острова очень доступны'},
+      '9_vnzh':      {gpt:0,gemini:0,claude:8,desc:'Полностью португальские пути: D7, NHR, Digital Nomad Visa — рабочие схемы'},
+      '9_citizen':   {gpt:0,gemini:0,claude:8,desc:'5 лет + португальский = паспорт ЕС — те же условия, что и на материке'},
+      '9_rights':    {gpt:0,gemini:0,claude:9,desc:'Полные права ЕС, статус Португалии, верховенство права'},
+      '9_foreigners':{gpt:0,gemini:0,claude:9,desc:'Туристический остров с 500-летней историей приёма — культура гостеприимства'},
+      '9_english':   {gpt:0,gemini:0,claude:7,desc:'Туристическая отрасль тянет уровень вверх; лучше, чем материковая провинция'},
+      '9_russian':   {gpt:0,gemini:0,claude:3,desc:'Небольшая, но растущая диаспора после 2022'},
+      '9_cohesion':  {gpt:0,gemini:0,claude:9,desc:'Изолированный остров, сплочённое местное сообщество, низкая напряжённость'},
+      '9_crime':     {gpt:0,gemini:0,claude:9,desc:'Один из самых безопасных регионов Европы'},
+      '9_infra':     {gpt:0,gemini:0,claude:7,desc:'Хорошая для острова; знаменитые «левады» — уникальная экосистема'},
+      '9_jobs':      {gpt:0,gemini:0,claude:6,desc:'Удалённая работа — идеально; MIBC налоговый режим выгоден для компаний'},
+      '9_rent':      {gpt:0,gemini:0,claude:7,desc:'€900–1500/мес; дешевле Лиссабона при лучшем климате'},
+      '9_prices':    {gpt:0,gemini:0,claude:8,desc:'Снижен HVA (налог) на ряд товаров; чуть дешевле континентальной Португалии'},
+      '9_medicine':  {gpt:0,gemini:0,claude:7,desc:'Португальская система + региональные больницы; сложные случаи — в Лиссабон'},
+      '9_edu':       {gpt:0,gemini:0,claude:7,desc:'Португальская система; несколько международных программ на острове'},
+      // 🇪🇸 Канарские острова (автономный регион Испании)
+      '10_dist':     {gpt:0,gemini:0,claude:9,desc:'Атлантика у берегов Африки — 2 500 км от центра Европы, максимальная дистанция'},
+      '10_neutral':  {gpt:0,gemini:0,claude:5,desc:'Часть Испании/НАТО, но самая дальняя периферия, фактически вне досягаемости'},
+      '10_targets':  {gpt:0,gemini:0,claude:8,desc:'Нет ядерного или стратегического размещения; маловероятная цель'},
+      '10_barriers': {gpt:0,gemini:0,claude:10,desc:'Атлантические острова — лучший природный барьер; от Европы только самолётом'},
+      '10_wind':     {gpt:0,gemini:0,claude:8,desc:'Пассаты с северо-востока, далеко от любых ядерных очагов — радиационный риск минимален'},
+      '10_food':     {gpt:0,gemini:0,claude:6,desc:'Туризм-ориентированная экономика; много импорта, но местные бананы, томаты, рыба'},
+      '10_water':    {gpt:0,gemini:0,claude:5,desc:'Хронический дефицит: зависят от опреснения; без энергии — катастрофа'},
+      '10_energy':   {gpt:0,gemini:0,claude:6,desc:'Активно строят ветряки; El Hierro — 100% ВИЭ-образец; другие острова догоняют'},
+      '10_industry': {gpt:0,gemini:0,claude:4,desc:'Туризм и порт Лас-Пальмас; реального производства крайне мало'},
+      '10_autoinfra':{gpt:0,gemini:0,claude:7,desc:'Хорошая дорожная сеть; аэропорты на каждом крупном острове'},
+      '10_survcond': {gpt:0,gemini:0,claude:9,desc:'«Вечная весна» +22°C круглый год — идеально при хроническом синусите'},
+      '10_shelter':  {gpt:0,gemini:0,claude:7,desc:'Умеренные цены; пальмовые вилеш за пределами туристических зон доступны'},
+      '10_vnzh':     {gpt:0,gemini:0,claude:8,desc:'Те же условия, что Испания: Digital Nomad Visa, Non-Lucrative Visa'},
+      '10_citizen':  {gpt:0,gemini:0,claude:6,desc:'10 лет как часть Испании → паспорт ЕС'},
+      '10_rights':   {gpt:0,gemini:0,claude:9,desc:'Полные права ЕС, испанская конституция, независимые суды'},
+      '10_foreigners':{gpt:0,gemini:0,claude:9,desc:'Глубоко туристическая культура; UK и ирландские экспаты — привычное явление'},
+      '10_english':  {gpt:0,gemini:0,claude:8,desc:'Отлично: огромная британская/ирландская диаспора, весь сервис по-английски'},
+      '10_russian':  {gpt:0,gemini:0,claude:4,desc:'Небольшая диаспора, меньше чем на Кипре'},
+      '10_cohesion': {gpt:0,gemini:0,claude:8,desc:'Стабильный автономный регион; каталонской напряжённости здесь нет'},
+      '10_crime':    {gpt:0,gemini:0,claude:8,desc:'Низкий уровень; туристические кражи локально, в целом безопасно'},
+      '10_infra':    {gpt:0,gemini:0,claude:7,desc:'Хорошая инфраструктура; особая экономическая зона (ZEC) — льготы'},
+      '10_jobs':     {gpt:0,gemini:0,claude:5,desc:'Туризм-зависимый; ZEC-зона снижает налоги; удалённая работа — отлично'},
+      '10_rent':     {gpt:0,gemini:0,claude:7,desc:'€900–1400/мес; Gran Canaria доступнее Тенерифе'},
+      '10_prices':   {gpt:0,gemini:0,claude:7,desc:'IGIC 7% вместо 21% НДС — товары ощутимо дешевле, чем в материковой Испании'},
+      '10_medicine': {gpt:0,gemini:0,claude:8,desc:'Испанская система здравоохранения; несколько хорошие частные клиники'},
+      '10_edu':      {gpt:0,gemini:0,claude:7,desc:'Испанская система + международные school в Лас-Пальмасе/Санта-Крусе'},
+      // 🇦🇱 Албания
+      '11_dist':     {gpt:0,gemini:0,claude:7,desc:'Западные Балканы, Адриатика — достаточно далеко от украинского фронта'},
+      '11_neutral':  {gpt:0,gemini:0,claude:7,desc:'НАТО с 2009, но минимальное военное значение; нет стратегических баз'},
+      '11_targets':  {gpt:0,gemini:0,claude:7,desc:'Нет ядерных объектов; периферийный член НАТО без особого стратегического веса'},
+      '11_barriers': {gpt:0,gemini:0,claude:7,desc:'Горные Балканы на востоке; Адриатика на западе — неплохая природная защита'},
+      '11_wind':     {gpt:0,gemini:0,claude:7,desc:'Средиземноморские ветра Адриатики; в стороне от основных радиационных маршрутов'},
+      '11_food':     {gpt:0,gemini:0,claude:7,desc:'Развитое традиционное с/х: оливки, виноград, зерно, овощи; агро-потенциал высок'},
+      '11_water':    {gpt:0,gemini:0,claude:7,desc:'Горные реки в изобилии; дефицит воды не характерен для страны'},
+      '11_energy':   {gpt:0,gemini:0,claude:7,desc:'95%+ гидроэнергетика — редкий случай почти полной энергетической независимости'},
+      '11_industry': {gpt:0,gemini:0,claude:4,desc:'Текстиль, нефтепереработка, хром; промышленная база слабая'},
+      '11_autoinfra':{gpt:0,gemini:0,claude:5,desc:'Активно строит, но значительно отстаёт от ЕС-стандарта'},
+      '11_survcond': {gpt:0,gemini:0,claude:7,desc:'Средиземноморский климат на побережье — хорош при синусите; горы суровее'},
+      '11_shelter':  {gpt:0,gemini:0,claude:8,desc:'Одна из самых дешёвых недвижимостей в Европе; земля легко купить'},
+      '11_vnzh':     {gpt:0,gemini:0,claude:8,desc:'Безвизовый въезд на 1 год без регистрации; ВНЖ через аренду или инвестиции'},
+      '11_citizen':  {gpt:0,gemini:0,claude:5,desc:'5 лет ПМЖ → гражданство; не ЕС — менее привлекательно на перспективу'},
+      '11_rights':   {gpt:0,gemini:0,claude:7,desc:'Активные реформы ради вступления в ЕС; правовое государство укрепляется'},
+      '11_foreigners':{gpt:0,gemini:0,claude:7,desc:'В целом доброжелательны; культура гостеприимства «бесафа» — традиционная'},
+      '11_english':  {gpt:0,gemini:0,claude:6,desc:'Молодёжь хорошо; деловая среда — нормально; провинция слабее'},
+      '11_russian':  {gpt:0,gemini:0,claude:2,desc:'Исторически нейтральны к СССР; диаспора практически отсутствует'},
+      '11_cohesion': {gpt:0,gemini:0,claude:7,desc:'Клановая культура, но относительно стабильная; реформы идут'},
+      '11_crime':    {gpt:0,gemini:0,claude:6,desc:'Умеренный уровень; организованная преступность — известный регуляторный вопрос'},
+      '11_infra':    {gpt:0,gemini:0,claude:5,desc:'Тирана и Дуррес — нормально; регионы значительно слабее'},
+      '11_jobs':     {gpt:0,gemini:0,claude:4,desc:'Очень маленький рынок труда; крипто/финтех практически нет'},
+      '11_rent':     {gpt:0,gemini:0,claude:9,desc:'Один из дешевейших вариантов Европы: €350–650/мес у Адриатики'},
+      '11_prices':   {gpt:0,gemini:0,claude:9,desc:'Очень дёшево; продукты, еда, транспорт — в 2–3 раза ниже ЗЕ уровня'},
+      '11_medicine': {gpt:0,gemini:0,claude:5,desc:'Слабая государственная система; серьёзные случаи — в Тирану или Италию'},
+      '11_edu':      {gpt:0,gemini:0,claude:5,desc:'Базовый уровень; практически нет международных школ для экс-планирования'},
+      // 🇸🇮 Словения
+      '12_dist':     {gpt:0,gemini:0,claude:7,desc:'Центральная Европа; западнее Украины, альпийский буфер от востока'},
+      '12_neutral':  {gpt:0,gemini:0,claude:6,desc:'НАТО и ЕС; небольшая армия, нет стратегических баз на территории'},
+      '12_targets':  {gpt:0,gemini:0,claude:7,desc:'Нет значимых военных объектов, нет ядерных установок, малое стратегическое значение'},
+      '12_barriers': {gpt:0,gemini:0,claude:8,desc:'Альпы на севере — один из лучших горных барьеров в центральной Европе'},
+      '12_wind':     {gpt:0,gemini:0,claude:7,desc:'Альпийские и адриатические ветра; в стороне от основных ядерных целей'},
+      '12_food':     {gpt:0,gemini:0,claude:7,desc:'Развитое с/х: виноград, молочное, животноводство, лес; самодостаточность высокая'},
+      '12_water':    {gpt:0,gemini:0,claude:9,desc:'Одна из самых водообеспеченных стран: горные реки, озёра, Сoca, Сава, карст'},
+      '12_energy':   {gpt:0,gemini:0,claude:7,desc:'АЭС Кршко (~40%) + гидро + ВИЭ; энергетически сбалансирована'},
+      '12_industry': {gpt:0,gemini:0,claude:7,desc:'Авто-компоненты (Renault), фармацевтика (Krka), электроника; развита для размера'},
+      '12_autoinfra':{gpt:0,gemini:0,claude:8,desc:'Отличная инфраструктура ЕС-стандарта; скоростные дороги, ж/д, порт Копер'},
+      '12_survcond': {gpt:0,gemini:0,claude:7,desc:'Альпийский и средиземноморский климат; Приморска — сухо и тепло; горы — влажно'},
+      '12_shelter':  {gpt:0,gemini:0,claude:7,desc:'Умеренные цены вне Любляны; сельская местность очень доступна'},
+      '12_vnzh':     {gpt:0,gemini:0,claude:7,desc:'Стандартные ЕС-пути; нет специальной Nomad Visa, но трудовые и иные рабочие'},
+      '12_citizen':  {gpt:0,gemini:0,claude:7,desc:'10 лет → паспорт ЕС; требует отказа от других гражданств (есть исключения)'},
+      '12_rights':   {gpt:0,gemini:0,claude:9,desc:'Полные права ЕС, независимые суды, высокоразвитая демократия (ЕС-топ)'},
+      '12_foreigners':{gpt:0,gemini:0,claude:7,desc:'Нейтральное, скорее открытое отношение; меньше туристического опыта'},
+      '12_english':  {gpt:0,gemini:0,claude:7,desc:'Широко среди молодёжи и бизнеса; на улице — нормально'},
+      '12_russian':  {gpt:0,gemini:0,claude:3,desc:'Небольшое пассивное понимание из-за славянского родства; диаспоры нет'},
+      '12_cohesion': {gpt:0,gemini:0,claude:8,desc:'Очень стабильная страна с высоким социальным капиталом'},
+      '12_crime':    {gpt:0,gemini:0,claude:9,desc:'Один из самых низких уровней преступности в Европе'},
+      '12_infra':    {gpt:0,gemini:0,claude:8,desc:'Отличная, стандарт ЕС; порт Копер — важный логистический узел'},
+      '12_jobs':     {gpt:0,gemini:0,claude:6,desc:'Небольшой, но развитый IT/финтех; удалённая работа возможна без ограничений'},
+      '12_rent':     {gpt:0,gemini:0,claude:7,desc:'Любляна: €1200–1800/мес; регионы и Приморска значительно дешевле'},
+      '12_prices':   {gpt:0,gemini:0,claude:7,desc:'Умеренные — ниже Австрии и Германии, выше Хорватии'},
+      '12_medicine': {gpt:0,gemini:0,claude:8,desc:'Отличная система здравоохранения ЕС; универсальное покрытие'},
+      '12_edu':      {gpt:0,gemini:0,claude:8,desc:'Отличные школы; словенское общество высоко ценит образование — исторически'},
+      // 🇮🇪 Ирландия
+      '13_dist':     {gpt:0,gemini:0,claude:9,desc:'Крайний северо-запад Европы — максимально далеко от любого восточного фронта'},
+      '13_neutral':  {gpt:0,gemini:0,claude:7,desc:'Не в НАТО; традиционная военная нейтральность; ЕС, но без взаимной обороны'},
+      '13_targets':  {gpt:0,gemini:0,claude:8,desc:'Нет ядерных объектов; вне НАТО — риск заметно ниже членов альянса'},
+      '13_barriers': {gpt:0,gemini:0,claude:9,desc:'Остров в Атлантике; Irish Sea и Кельтское море — надёжное водное кольцо'},
+      '13_wind':     {gpt:0,gemini:0,claude:8,desc:'Преобладающие западные атлантические ветра несут чистый воздух с океана'},
+      '13_food':     {gpt:0,gemini:0,claude:7,desc:'Сильное животноводство и молочная промышленность; зерновые ограничены'},
+      '13_water':    {gpt:0,gemini:0,claude:9,desc:'Огромнейшее количество дождей; реки, озёра — нет даже намёка на дефицит воды'},
+      '13_energy':   {gpt:0,gemini:0,claude:6,desc:'Мощная ветровая генерация; но импортирует газ и нефть — зависимость есть'},
+      '13_industry': {gpt:0,gemini:0,claude:7,desc:'Фармацевтика, IT-гиганты, производство медоборудования — высокоразвитая база'},
+      '13_autoinfra':{gpt:0,gemini:0,claude:7,desc:'Хорошая инфраструктура; ЕС-инвестиции трансформировали страну за 30 лет'},
+      '13_survcond': {gpt:0,gemini:0,claude:5,desc:'Дождливый холодный климат — хроническая влажность плохо переносится при синусите'},
+      '13_shelter':  {gpt:0,gemini:0,claude:5,desc:'Жилищный кризис; Дублин — один из самых дорогих городов ЕС'},
+      '13_vnzh':     {gpt:0,gemini:0,claude:7,desc:'ЕС; Critical Skills Permit и Stamp 4 — рабочие пути для квалифицированных'},
+      '13_citizen':  {gpt:0,gemini:0,claude:6,desc:'5 лет → паспорт ЕС; строгий учёт дней присутствия; достижимо'},
+      '13_rights':   {gpt:0,gemini:0,claude:9,desc:'Полные права ЕС, Совет Европы; образцовая демократия с независимыми медиа'},
+      '13_foreigners':{gpt:0,gemini:0,claude:8,desc:'Культура pub и pub-talk; исторически открытые к волнам иммиграции'},
+      '13_english':  {gpt:0,gemini:0,claude:10,desc:'Родной язык — никакого барьера, идеально для семьи'},
+      '13_russian':  {gpt:0,gemini:0,claude:2,desc:'Минимальная диаспора; русский язык почти не встречается'},
+      '13_cohesion': {gpt:0,gemini:0,claude:8,desc:'Стабильное сплочённое общество; кризис 2008 прошли и вышли сильнее'},
+      '13_crime':    {gpt:0,gemini:0,claude:8,desc:'Низкий уровень насилия; Дублин — некоторые районы осторожнее'},
+      '13_infra':    {gpt:0,gemini:0,claude:7,desc:'Хорошая, особенно в Большом Дублине; регионы менее развиты'},
+      '13_jobs':     {gpt:0,gemini:0,claude:8,desc:'Европейский tech/fintech/crypto хаб: Google, Meta, Stripe, Coinbase EU-офисы'},
+      '13_rent':     {gpt:0,gemini:0,claude:4,desc:'Жилищный кризис: Дублин €2 000+/мес; регионы дешевле, но всё равно высоко'},
+      '13_prices':   {gpt:0,gemini:0,claude:5,desc:'Дорогие продукты, рестораны и сервисы — один из самых дорогих рынков ЕС'},
+      '13_medicine': {gpt:0,gemini:0,claude:8,desc:'Хорошая система; частная медицина быстрее; государственная — с очередями'},
+      '13_edu':      {gpt:0,gemini:0,claude:9,desc:'Отличные школы; образование на английском; университеты мирового уровня'},
+      // 🇳🇿 Новая Зеландия
+      '14_dist':     {gpt:0,gemini:0,claude:10,desc:'Самая удалённая страна мира от всех основных зон конфликта'},
+      '14_neutral':  {gpt:0,gemini:0,claude:9,desc:'Five Eyes участник, но в 15 000 км от любого фронта; доктрина — антиядерная'},
+      '14_targets':  {gpt:0,gemini:0,claude:10,desc:'Нет ядерных объектов, официально безъядерная зона; маловероятнее всех в списке'},
+      '14_barriers': {gpt:0,gemini:0,claude:10,desc:'Остров в Тихом океане — максимально возможная природная изоляция на планете'},
+      '14_wind':     {gpt:0,gemini:0,claude:10,desc:'Западные ветра Южного Океана; 15 000+ км до ближайших ядерных целей'},
+      '14_food':     {gpt:0,gemini:0,claude:9,desc:'Один из крупнейших агро-экспортёров мира: молоко, мясо, фрукты, рыба — избыток'},
+      '14_water':    {gpt:0,gemini:0,claude:9,desc:'Обильные реки, озёра, дожди; горные ледники — запасы воды на сотни лет'},
+      '14_energy':   {gpt:0,gemini:0,claude:8,desc:'80%+ возобновляемая энергетика: гидро, геотермальная, ветер — почти независима'},
+      '14_industry': {gpt:0,gemini:0,claude:6,desc:'Сельское хозяйство, туризм, небольшая промышленность; IT растёт, но мало'},
+      '14_autoinfra':{gpt:0,gemini:0,claude:7,desc:'Хорошая, но изолированность удорожает всё; острова разрознены'},
+      '14_survcond': {gpt:0,gemini:0,claude:8,desc:'Умеренный климат; Окленд мягкий +23/14°C; Южный остров холоднее; в целом хорош'},
+      '14_shelter':  {gpt:0,gemini:0,claude:6,desc:'Жилищный кризис в Окленде; провинция и Южный остров — доступнее'},
+      '14_vnzh':     {gpt:0,gemini:0,claude:6,desc:'Skill-шкала; после реформ 2023 требования выросли; Green List для дефицитных профессий'},
+      '14_citizen':  {gpt:0,gemini:0,claude:6,desc:'5 лет + 1 350 дней физического присутствия → паспорт; жёсткое требование по дням'},
+      '14_rights':   {gpt:0,gemini:0,claude:9,desc:'Образцовая демократия; Bill of Rights; независимые медиа, прозрачные суды'},
+      '14_foreigners':{gpt:0,gemini:0,claude:8,desc:'Очень мультикультурная (40%+ населения Окленда = иностранцы); исторически открытая'},
+      '14_english':  {gpt:0,gemini:0,claude:10,desc:'Родной язык — никакого барьера, полная интеграция семьи'},
+      '14_russian':  {gpt:0,gemini:0,claude:2,desc:'Минимальная русская диаспора'},
+      '14_cohesion': {gpt:0,gemini:0,claude:8,desc:'Стабильное мультикультурное общество; Waitangi-трактат задаёт модель сотрудничества'},
+      '14_crime':    {gpt:0,gemini:0,claude:8,desc:'Низкий уровень насильственных преступлений; Окленд — некоторые районы осторожнее'},
+      '14_infra':    {gpt:0,gemini:0,claude:7,desc:'Хорошая внутри, но изолированность от мира — слабое место в сценарии коллапса'},
+      '14_jobs':     {gpt:0,gemini:0,claude:5,desc:'Изолированный рынок; крипто/AML-ниша маленькая; удалённая работа сложнее с часовым поясом'},
+      '14_rent':     {gpt:0,gemini:0,claude:5,desc:'Дорогой Окленд (NZD 3 500+/мес); регионы и Christchurch/Dunedin — умеренно'},
+      '14_prices':   {gpt:0,gemini:0,claude:5,desc:'Дорого: изолированность удорожает импорт; продукты и товары выше мирового уровня'},
+      '14_medicine': {gpt:0,gemini:0,claude:8,desc:'Отличная система здравоохранения; ACC — уникальное страхование от травм'},
+      '14_edu':      {gpt:0,gemini:0,claude:9,desc:'Отличные школы; образование на английском; NCEA-стандарт признан мировым'},
+    },
+  };
+}
+
+let S = (() => {
+  try { const d = localStorage.getItem('sv_compare_v6'); return d ? JSON.parse(d) : defaultState(); }
+  catch { return defaultState(); }
+})();
+
+S.countries = S.countries.map(c => ({
+  ...c,
+  name: stripFlagPrefix(c.name),
+  color: c.color || COLORS[(c.id - 1) % COLORS.length],
+}));
+
+function save() { localStorage.setItem('sv_compare_v6', JSON.stringify(S)); }
+
+let gptSeeded = applyGpt54Seed(S);
+let geminiSeeded = applyGemini31Seed(S);
+if (gptSeeded || geminiSeeded) save();
+
+// ═══════════════════════════════ CALC ═════════════════════════════════════
+function stripFlagPrefix(name) {
+  return String(name || '')
+    .replace(/^[\u{1F1E6}-\u{1F1FF}]{2}\s*/u, '')
+    .trim();
+}
+function getCountryCode(country) {
+  return COUNTRY_CODES[country.id] || 'un';
+}
+function getCountryFlagUrl(country) {
+  const code = getCountryCode(country);
+  return `https://flagcdn.com/w40/${code}.png`;
+}
+function renderCountryLabel(country, size = 'sm') {
+  const cleanName = esc(stripFlagPrefix(country.name));
+  return `<span class="country-label"><img class="flag-icon ${size}" src="${getCountryFlagUrl(country)}" alt="" loading="lazy" decoding="async"><span>${cleanName}</span></span>`;
+}
+
+function avg3(a,b,c) {
+  const v = [a,b,c].filter(x => x > 0);
+  return v.length ? v.reduce((s,x) => s+x, 0) / v.length : 0;
+}
+function fmtAi(d, k1, k2, k3) {
+  return [d[k1]||0, d[k2]||0, d[k3]||0].map(x => x || '·').join('/');
+}
+function getModelValue(d) {
+  if (!d) return 0;
+  if (activeModel === 'avg') return avg3(d.gpt, d.gemini, d.claude);
+  return d[activeModel] || 0;
+}
+function getW(fId) {
+  const w = S.weights[fId] || {gpt:0,gemini:0,claude:0};
+  return getModelValue(w);
+}
+function getS(cId, fId) {
+  const d = S.scores[`${cId}_${fId}`] || {gpt:0,gemini:0,claude:0,desc:''};
+  return getModelValue(d);
+}
+function wScore(cId, fId) {
+  const w = getW(fId), s = getS(cId, fId);
+  return (w && s) ? (w * s / 10) : 0;
+}
+function total(cId) { return ALL_FACTORS.reduce((sum,f) => sum + wScore(cId, f.id), 0); }
+function maxPossible() { return ALL_FACTORS.reduce((sum,f) => sum + getW(f.id), 0); }
+
+function colorScore(v) {
+  if (!v) return 'var(--muted)';
+  if (v <= 3) return 'var(--red)';
+  if (v <= 5) return 'var(--orange)';
+  if (v <= 7) return 'var(--yellow)';
+  return 'var(--green)';
+}
+function classScore(v) {
+  if (!v) return 'sc-0';
+  if (v <= 3) return 'sc-lo';
+  if (v <= 5) return 'sc-md';
+  if (v <= 7) return 'sc-hi';
+  return 'sc-vhi';
+}
+function barClass(v) {
+  if (!v) return '';
+  if (v <= 3) return 'bar-lo';
+  if (v <= 5) return 'bar-md';
+  if (v <= 7) return 'bar-hi';
+  return 'bar-vhi';
+}
+function colorWeight(v) {
+  if (!v) return 'var(--muted)';
+  if (v <= 3) return 'var(--muted)';
+  if (v <= 6) return 'var(--yellow)';
+  if (v <= 8) return 'var(--orange)';
+  return 'var(--red)';
+}
+function colorTotal(v) {
+  if (!v) return 'var(--muted)';
+  if (v < 5.5) return 'var(--red)';
+  if (v < 6.5) return 'var(--orange)';
+  if (v < 7.5) return 'var(--yellow)';
+  return 'var(--green)';
+}
+
+// ═══════════════════════════════ RENDER ═══════════════════════════════════
+function getVisibleCountries() {
+  return S.countries
+    .filter(c => filter.countries.has(c.id))
+    .map(c => ({ ...c, t: total(c.id) }))
+    .sort((a, b) => b.t - a.t);
+}
+
+function getVisibleRowsByGroup(vis) {
+  const searchLow = filter.search.toLowerCase();
+  return GROUPS
+    .filter(grp => filter.groups.has(grp.id))
+    .map(grp => {
+      const rows = grp.items.filter(f => {
+        if (searchLow && !f.name.toLowerCase().includes(searchLow)) return false;
+        if (filter.minScore > 0) {
+          const best = vis.reduce((mx, c) => Math.max(mx, getS(c.id, f.id)), 0);
+          if (best < filter.minScore) return false;
+        }
+        return true;
+      });
+      return { ...grp, rows };
+    })
+    .filter(grp => grp.rows.length > 0);
+}
+
+function groupAverage(cId, grp) {
+  const factors = grp.rows || grp.items || [];
+  const scores = factors.map(f => getS(cId, f.id)).filter(v => v > 0);
+  return scores.length ? scores.reduce((sum, value) => sum + value, 0) / scores.length : 0;
+}
+
+function render() {
+  const vis = getVisibleCountries();
+  const groups = getVisibleRowsByGroup(vis);
+  renderModelStrip();
+  renderHero(vis, groups);
+  renderStats(vis, groups);
+  renderGroupOverview(vis, groups);
+  renderMatrixMeta(vis, groups);
+  renderTable(vis, groups);
+}
+
+function renderModelStrip() {
+  const text = document.getElementById('modelStripText');
+  const max = maxPossible();
+  const hasData = max > 0;
+  const modeCopy = activeModel === 'avg'
+    ? 'по среднему значению трёх моделей'
+    : `по модели ${MODEL_LABELS[activeModel]}`;
+  text.textContent = hasData
+    ? `Сейчас все блоки ниже считают веса, баллы, лидерство и итоги ${modeCopy}.`
+    : `Сейчас выбран расчёт ${modeCopy}, но для него в данных почти нет заполненных значений.`;
+
+  const states = [
+    ['mdlAvg', activeModel === 'avg'],
+    ['mdlGpt', activeModel === 'gpt'],
+    ['mdlGemini', activeModel === 'gemini'],
+    ['mdlClaude', activeModel === 'claude'],
+  ];
+  states.forEach(([id, active]) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('active', active);
+  });
+}
+
+function renderHero(vis, groups) {
+  const mp = maxPossible();
+  const leader = vis[0];
+  const runnerUp = vis[1];
+  const hero = document.getElementById('heroSummary');
+  const rail = document.getElementById('countryRail');
+
+  if (!leader) {
+    hero.innerHTML = `<div class="hero-inner"><div class="hero-title">Нет стран в отображении</div><div class="hero-meta">Включите хотя бы одну страну в фильтрах.</div></div>`;
+    rail.innerHTML = '';
+    return;
+  }
+
+  const leaderScore10 = mp > 0 ? leader.t / mp * 10 : 0;
+  const runnerScore10 = runnerUp && mp > 0 ? runnerUp.t / mp * 10 : 0;
+  const gap = runnerUp ? leaderScore10 - runnerScore10 : leaderScore10;
+  const leaderTone = colorTotal(leaderScore10);
+  const topGroup = groups.length ? groups
+    .map(grp => ({ grp, score: groupAverage(leader.id, grp) }))
+    .sort((a, b) => b.score - a.score)[0] : null;
+
+  hero.innerHTML = `
+    <div class="hero-inner">
+      <div class="hero-kicker">Лучший текущий кандидат по ${MODEL_LABELS[activeModel]}</div>
+      <div class="hero-grid-main">
+        <div class="hero-lead">
+          <div class="hero-title">${renderCountryLabel(leader, 'lg')}</div>
+          <div class="hero-score-line">
+            <div class="hero-score" style="color:${leaderTone}">${leaderScore10.toFixed(1)} <span style="font-size:24px; opacity:0.5; font-weight:400;">/ 10</span></div>
+            <div class="mini-tag" style="border-color:${leader.color}; color:${leader.color}">цвет страны</div>
+          </div>
+          <div class="hero-meta">Это лучший суммарный результат по вашим текущим весам факторов (10 — идеал, 0 — катастрофа). Страна набирает ${leader.t.toFixed(1)} баллов из ${mp.toFixed(0)} возможных.</div>
+          <div class="hero-tags">
+            <div class="mini-tag">Сильнейший блок: ${topGroup ? `${topGroup.grp.icon} ${topGroup.grp.name}` : '—'}</div>
+            <div class="mini-tag">Видно стран: ${vis.length}</div>
+            <div class="mini-tag">Модель: ${activeModel === 'avg' ? 'Среднее' : MODEL_LABELS[activeModel]}</div>
+            <div class="mini-tag">Детали: ${detailMode ? 'по моделям AI' : 'краткий вид'}</div>
+          </div>
+        </div>
+        <div class="hero-delta">
+          <div class="hero-delta-label">Запас над следующим местом</div>
+          <div class="hero-delta-value" style="color:${gap >= 0 ? 'var(--green)' : 'var(--red)'}">+${gap.toFixed(1)} балла</div>
+          <div class="hero-delta-copy">${runnerUp ? `Сейчас ${stripFlagPrefix(leader.name)} опережает ${stripFlagPrefix(runnerUp.name)} в рейтинге.` : 'В отображении осталась только одна страна, поэтому разрыв не рассчитывается.'}</div>
+        </div>
+      </div>
+    </div>`;
+
+  const topT = leader.t || 0;
+  rail.innerHTML = vis.map((c, index) => {
+    const score10 = mp > 0 ? c.t / mp * 10 : 0;
+    const rel = topT > 0 ? c.t / topT * 100 : 0;
+    const tone = colorTotal(score10);
+    return `
+      <div class="country-card ${index === 0 ? 'top-country' : ''}" style="--country-color:${c.color}">
+        <div class="country-rank">${index + 1} место</div>
+        <div class="country-name"><span class="country-name-line">${renderCountryLabel(c, 'lg')}</span></div>
+        <div class="country-score" style="color:${tone}">${score10.toFixed(1)} <span style="font-size:var(--text-sm, 14px); opacity:0.6;">/ 10</span></div>
+        <div class="country-sub">${c.t.toFixed(1)} / ${mp.toFixed(0)} баллов</div>
+        <div class="country-bar-bg"><div class="country-bar" style="width:${(score10 * 10).toFixed(1)}%; background:${tone}"></div></div>
+      </div>`;
+  }).join('');
+}
+
+function renderStats(vis, groups) {
+  const host = document.getElementById('quickStats');
+  const mp = maxPossible();
+  const leader = vis[0];
+  const weakest = vis[vis.length - 1];
+  const weakestScore10 = weakest && mp > 0 ? (weakest.t / mp * 10) : 0;
+  const visibleFactors = groups.reduce((sum, grp) => sum + grp.rows.length, 0);
+  const criticalFactors = groups.reduce((sum, grp) => sum + grp.rows.filter(f => getW(f.id) >= 8).length, 0);
+
+  host.innerHTML = `
+    <div class="panel-title">Сводка по экрану</div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Лидер сейчас</div>
+        <div class="stat-value" style="color:${leader ? leader.color : 'var(--text)'}">${leader ? renderCountryLabel(leader, 'sm') : '—'}</div>
+        <div class="stat-copy">Лучший суммарный балл среди видимых стран.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Самый слабый из видимых</div>
+        <div class="stat-value" style="color:${weakest ? colorTotal(weakestScore10) : 'var(--text)'}">${weakest ? (mp > 0 ? weakestScore10.toFixed(1) + ' / 10' : '—') : '—'}</div>
+        <div class="stat-copy">${weakest ? renderCountryLabel(weakest, 'sm') : 'Нет данных'}.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Факторы на экране</div>
+        <div class="stat-value">${visibleFactors}</div>
+        <div class="stat-copy">После применения поиска, порога и фильтра по группам.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Критичных факторов</div>
+        <div class="stat-value">${criticalFactors}</div>
+        <div class="stat-copy">Строк с весом 8+ для ${activeModel === 'avg' ? 'среднего режима' : MODEL_LABELS[activeModel]}.</div>
+      </div>
+    </div>`;
+}
+
+function renderGroupOverview(vis, groups) {
+  const host = document.getElementById('groupOverview');
+  if (!vis.length || !groups.length) {
+    host.innerHTML = `<div class="group-card"><div class="group-name">Нет данных для обзора</div><div class="group-sub">Снимите часть фильтров, чтобы вернуть блоки факторов.</div></div>`;
+    return;
+  }
+
+  host.innerHTML = groups.map(grp => {
+    const ranked = vis
+      .map(c => ({ ...c, score: groupAverage(c.id, grp) }))
+      .sort((a, b) => b.score - a.score);
+    const top = ranked[0];
+    return `
+      <article class="group-card">
+        <div class="group-head">
+          <div>
+            <div class="group-name">${grp.icon} ${grp.name}</div>
+            <div class="group-sub">${grp.sub || 'Сравнение внутри тематического блока'}</div>
+          </div>
+          <div class="mini-tag">${grp.rows.length} факторов</div>
+        </div>
+        <div class="group-top">
+          <div>
+            <div class="group-country" style="color:${top ? top.color : 'var(--text)'}">${top ? renderCountryLabel(top, 'sm') : '—'}</div>
+            <div class="group-sub">Лучший средний балл в блоке</div>
+          </div>
+          <div class="group-score" style="color:${top ? colorTotal(top.score) : 'var(--text)'}">${top && top.score ? top.score.toFixed(1) + ' <span style="font-size:12px; opacity:0.6">/ 10</span>' : '—'}</div>
+        </div>
+        <div class="group-list">
+          ${ranked.map(c => `
+            <div>
+              <div class="group-row"><strong>${renderCountryLabel(c, 'sm')}</strong><span>${c.score ? c.score.toFixed(1) : '—'}</span></div>
+              <div class="group-bar-bg"><div class="group-bar" style="width:${(c.score / 10 * 100).toFixed(1)}%; background:${colorTotal(c.score)}"></div></div>
+            </div>`).join('')}
+        </div>
+      </article>`;
+  }).join('');
+}
+
+function renderMatrixMeta(vis, groups) {
+  const host = document.getElementById('matrixMeta');
+  const activeGroups = groups.length;
+  const visibleFactors = groups.reduce((sum, grp) => sum + grp.rows.length, 0);
+  host.innerHTML = `
+    <div class="meta-chip">Стран: ${vis.length}</div>
+    <div class="meta-chip">Групп: ${activeGroups}</div>
+    <div class="meta-chip">Факторов: ${visibleFactors}</div>
+    <div class="meta-chip">Модель: ${activeModel === 'avg' ? 'Среднее' : MODEL_LABELS[activeModel]}</div>`;
+}
+
+function renderTable(vis = getVisibleCountries(), groups = getVisibleRowsByGroup(vis)) {
+  const tbl = document.getElementById('tbl');
+  let h = '';
+
+  // ── THEAD ──
+  h += '<thead><tr>';
+  h += `<th class="col-factor"><div class="th-factor-cell">Фактор</div></th>`;
+  h += `<th class="col-weight"><div class="th-weight-cell">Вес</div></th>`;
+  const mp = maxPossible();
+  vis.forEach(c => {
+    const score10 = mp > 0 ? (total(c.id) / mp * 10) : 0;
+    const tone = colorTotal(score10);
+    h += `<th class="col-country">
+      <div class="th-country-wrap">
+        <div class="th-cname-static">${renderCountryLabel(c, 'sm')}</div>
+        <div class="th-ctotal" style="color:${tone}">${score10 > 0 ? score10.toFixed(1)+' <span style="font-size:12px;opacity:0.6;font-weight:400">/ 10</span>' : '—'}</div>
+      </div></th>`;
+  });
+  h += '</tr></thead>';
+
+  // ── TBODY ──
+  h += '<tbody>';
+  groups.forEach(grp => {
+    const rows = grp.rows;
+    h += `<tr class="row-group"><td colspan="${2 + vis.length}">
+      <div class="group-row-inner">
+        <span>${grp.icon}</span><span>${grp.name}</span>
+        ${grp.sub ? `<span class="group-sub">— ${grp.sub}</span>` : ''}
+      </div></td></tr>`;
+
+    rows.forEach(f => {
+      const w = getW(f.id);
+      const wData = S.weights[f.id] || {gpt:0,gemini:0,claude:0};
+      const wColor = colorWeight(w);
+      h += '<tr class="row-factor">';
+      h += `<td class="col-factor"><div class="cell-fname">${esc(f.name)}</div></td>`;
+
+      if (w > 0) {
+        const sub = detailMode ? `<div class="w-sub">${fmtAi(wData,'gpt','gemini','claude')}</div>` : '';
+        h += `<td class="col-weight"><div class="cell-weight" style="justify-content:center">
+          <div class="w-badge" style="border-color:${wColor};color:${wColor}">${w.toFixed(1)}</div>${sub}
+        </div></td>`;
+      } else {
+        h += `<td class="col-weight"><div class="cell-weight" style="justify-content:center">
+          <div class="w-badge" style="border-style:dashed;color:var(--muted)">—</div>
+        </div></td>`;
+      }
+
+      vis.forEach(c => {
+        const s = getS(c.id, f.id);
+        const sData = S.scores[`${c.id}_${f.id}`] || {gpt:0,gemini:0,claude:0,desc:''};
+        h += `<td class="col-country">`;
+        if (s > 0) {
+          const pct = s / 10 * 100;
+          const sub = detailMode ? `<div class="sc-sub">${fmtAi(sData,'gpt','gemini','claude')}</div>` : '';
+          const desc = sData.desc
+            ? `<div class="sc-desc">${esc(sData.desc)}</div><details class="sc-details"><summary class="sc-more">Показать описание</summary><div class="sc-desc-full">${esc(sData.desc)}</div></details>`
+            : '';
+          h += `<div class="sc-inner">
+            <div class="sc-val ${classScore(s)}">${s.toFixed(1)}</div>
+            ${sub}
+            <div class="sc-bar-bg"><div class="sc-bar ${barClass(s)}" style="width:${pct}%"></div></div>
+            ${desc}
+          </div>`;
+        } else {
+          h += `<div style="color:var(--border);font-size:14px;text-align:center">—</div>`;
+        }
+        h += '</td>';
+      });
+      h += '</tr>';
+    });
+  });
+
+  // totals row
+  h += '<tr class="row-total">';
+  h += `<td class="col-factor"><div class="total-label">Взвешенный итог (баллы из 10)</div></td><td class="col-weight"></td>`;
+  vis.forEach(c => {
+    const t = total(c.id);
+    const score10 = mp > 0 ? (t / mp * 10) : 0;
+    const tone = colorTotal(score10);
+    const raw = t > 0 ? `<div style="font-size:10px;color:var(--muted);font-weight:400;margin-top:3px">${t.toFixed(1)}&thinsp;/&thinsp;${mp.toFixed(0)} взвеш.</div>` : '';
+    h += `<td class="col-country total-score" style="color:${tone}">${score10 > 0 ? score10.toFixed(1)+' <span style="font-size:12px;opacity:0.6;font-weight:400">/ 10</span>' : '—'}${raw}</td>`;
+  });
+  h += '</tr></tbody>';
+  tbl.innerHTML = h;
+}
+
+// ═══════════════════════════════ FILTERS ═════════════════════════════════
+function initFilters() {
+  // Seed filter.countries with all loaded countries so they're visible by default
+  S.countries.forEach(c => filter.countries.add(c.id));
+
+  // Populate country pills — built from current S.countries
+  const fc = document.getElementById('fCountries');
+  S.countries.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'fpill active';
+    btn.innerHTML = renderCountryLabel(c, 'sm');
+    btn.style.setProperty('--pill-color', c.color);
+    btn.dataset.cid = c.id;
+    btn.addEventListener('click', () => {
+      if (filter.countries.has(c.id)) {
+        if (filter.countries.size > 1) filter.countries.delete(c.id);
+      } else {
+        filter.countries.add(c.id);
+      }
+      btn.classList.toggle('active', filter.countries.has(c.id));
+      render();
+    });
+    fc.appendChild(btn);
+  });
+
+  // Populate group pills
+  const fg = document.getElementById('fGroups');
+  GROUPS.forEach(g => {
+    const btn = document.createElement('button');
+    btn.className = 'fpill active';
+    btn.textContent = g.name;
+    btn.dataset.gid = g.id;
+    btn.addEventListener('click', () => {
+      if (filter.groups.has(g.id)) {
+        if (filter.groups.size > 1) filter.groups.delete(g.id);
+      } else {
+        filter.groups.add(g.id);
+      }
+      btn.classList.toggle('active', filter.groups.has(g.id));
+      render();
+    });
+    fg.appendChild(btn);
+  });
+
+  const setModel = model => {
+    activeModel = model;
+    render();
+  };
+  document.getElementById('mdlAvg').addEventListener('click', () => setModel('avg'));
+  document.getElementById('mdlGpt').addEventListener('click', () => setModel('gpt'));
+  document.getElementById('mdlGemini').addEventListener('click', () => setModel('gemini'));
+  document.getElementById('mdlClaude').addEventListener('click', () => setModel('claude'));
+}
+
+// ═══════════════════════════════ UTILS ════════════════════════════════════
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════ INIT ════════════════════════════════════
+initFilters();
+render();
+</script>
+</body>
+</html>
