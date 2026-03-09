@@ -1746,6 +1746,10 @@ function render() {
   renderGroupOverview(vis, groups);
   renderMatrixMeta(vis, groups);
   renderTable(vis, groups);
+  // Rebuild sticky header clone after table re-render
+  if (typeof buildStickyHeader === 'function') {
+    setTimeout(buildStickyHeader, 30);
+  }
 }
 
 function renderModelStrip() {
@@ -2065,9 +2069,73 @@ function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// ═══════════════════════════════ STICKY HEADER ════════════════════════════
+let _stickyHdrEl = null;
+
+function buildStickyHeader() {
+  const wrap = document.querySelector('.table-wrap');
+  if (!wrap) return;
+  const tbl = wrap.querySelector('table');
+  const thead = tbl && tbl.querySelector('thead');
+  if (!thead) return;
+
+  if (_stickyHdrEl) { _stickyHdrEl.remove(); _stickyHdrEl = null; }
+
+  const host = document.createElement('div');
+  host.id = 'sticky-hdr';
+  host.style.cssText = [
+    'position:fixed','top:0','z-index:500','display:none',
+    'overflow:hidden','pointer-events:none',
+    'box-shadow:0 4px 24px rgba(0,0,0,.55)',
+    'border-bottom:1px solid rgba(121,149,201,.28)'
+  ].join(';');
+  document.body.appendChild(host);
+  _stickyHdrEl = host;
+
+  function syncAndShow() {
+    if (!wrap.isConnected) { host.remove(); _stickyHdrEl = null; return; }
+    const wrapRect = wrap.getBoundingClientRect();
+    const theadH = thead.offsetHeight;
+    const visible = wrapRect.top < 0 && wrapRect.bottom > theadH + 20;
+
+    if (!visible) { host.style.display = 'none'; return; }
+
+    // Rebuild clone if empty or widths changed
+    if (!host.querySelector('table') || host._tableW !== tbl.getBoundingClientRect().width) {
+      const origThs = Array.from(thead.querySelectorAll('th'));
+      const widths = origThs.map(th => th.getBoundingClientRect().width);
+      const cloneThead = thead.cloneNode(true);
+      cloneThead.querySelectorAll('th').forEach((th, i) => {
+        th.style.position = 'static';
+        th.style.left = 'unset';
+        if (widths[i]) { th.style.width = widths[i] + 'px'; th.style.minWidth = widths[i] + 'px'; }
+      });
+      const t = document.createElement('table');
+      const tW = tbl.getBoundingClientRect().width;
+      t.style.cssText = `border-collapse:separate;border-spacing:0;width:${tW}px;table-layout:fixed;min-width:unset;`;
+      t.appendChild(cloneThead);
+      host.innerHTML = '';
+      host.appendChild(t);
+      host._tableW = tW;
+    }
+
+    host.style.left = Math.max(0, wrapRect.left) + 'px';
+    host.style.width = (Math.min(wrapRect.right, window.innerWidth) - Math.max(0, wrapRect.left)) + 'px';
+    host.style.display = 'block';
+    const t = host.querySelector('table');
+    if (t) t.style.transform = `translateX(-${wrap.scrollLeft}px)`;
+  }
+
+  wrap.addEventListener('scroll', syncAndShow, { passive: true });
+  window.addEventListener('scroll', syncAndShow, { passive: true });
+  window.addEventListener('resize', () => { if (_stickyHdrEl) _stickyHdrEl._tableW = 0; syncAndShow(); });
+  setTimeout(syncAndShow, 50);
+}
+
 // ═══════════════════════════════ INIT ════════════════════════════════════
 initFilters();
 render();
+buildStickyHeader();
 </script>
 </body>
 </html>
