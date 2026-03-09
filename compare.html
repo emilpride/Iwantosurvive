@@ -609,6 +609,16 @@
       width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--border);
       display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900;
     }
+    .w-editable { cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; }
+    .w-editable:hover { transform: scale(1.12); box-shadow: 0 0 0 3px rgba(94,161,255,.25); }
+    .w-input {
+      width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent);
+      background: rgba(94,161,255,.14); color: #fff; text-align: center;
+      font-size: 13px; font-weight: 900; font-family: inherit;
+      padding: 0; outline: none; -moz-appearance: textfield;
+    }
+    .w-input::-webkit-outer-spin-button,
+    .w-input::-webkit-inner-spin-button { -webkit-appearance: none; }
     .w-sub { font-size: 10px; color: var(--muted2); letter-spacing: .4px; }
     .sc-inner { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px 8px; }
     .sc-val { font-size: 18px; font-weight: 900; line-height: 1; }
@@ -1963,11 +1973,11 @@ function renderTable(vis = getVisibleCountries(), groups = getVisibleRowsByGroup
       if (w > 0) {
         const sub = detailMode ? `<div class="w-sub">${fmtAi(wData,'gpt','gemini','claude')}</div>` : '';
         h += `<td class="col-weight"><div class="cell-weight" style="justify-content:center">
-          <div class="w-badge" style="border-color:${wColor};color:${wColor}">${w.toFixed(1)}</div>${sub}
+          <div class="w-badge w-editable" data-wfid="${f.id}" title="Нажмите для редактирования" style="border-color:${wColor};color:${wColor}">${w.toFixed(1)}</div>${sub}
         </div></td>`;
       } else {
         h += `<td class="col-weight"><div class="cell-weight" style="justify-content:center">
-          <div class="w-badge" style="border-style:dashed;color:var(--muted)">—</div>
+          <div class="w-badge w-editable" data-wfid="${f.id}" title="Нажмите для редактирования" style="border-style:dashed;color:var(--muted)">—</div>
         </div></td>`;
       }
 
@@ -2008,6 +2018,53 @@ function renderTable(vis = getVisibleCountries(), groups = getVisibleRowsByGroup
   });
   h += '</tr></tbody>';
   tbl.innerHTML = h;
+  attachWeightEditors();
+}
+
+// ═══════════════════════════════ WEIGHT EDITOR ═══════════════════════════
+let _weightEditorAttached = false;
+function attachWeightEditors() {
+  const tbl = document.getElementById('tbl');
+  if (!tbl || _weightEditorAttached) return;
+  _weightEditorAttached = true;
+  tbl.addEventListener('click', e => {
+    const badge = e.target.closest('.w-editable');
+    if (!badge || badge.querySelector('input')) return;
+    const fid = badge.dataset.wfid;
+    if (!fid) return;
+    openWeightEditor(badge, fid);
+  });
+}
+function openWeightEditor(badge, fid) {
+  const current = getW(fid);
+  const inp = document.createElement('input');
+  inp.type = 'number';
+  inp.min = '0'; inp.max = '10'; inp.step = '0.5';
+  inp.value = current > 0 ? current.toFixed(1) : '0';
+  inp.className = 'w-input';
+  badge.replaceChildren(inp);
+  inp.focus(); inp.select();
+  let committed = false;
+  const commit = () => {
+    if (committed) return;
+    committed = true;
+    let v = parseFloat(inp.value);
+    if (isNaN(v)) v = 0;
+    v = Math.max(0, Math.min(10, Math.round(v * 10) / 10));
+    const wData = S.weights[fid] || (S.weights[fid] = {gpt:0, gemini:0, claude:0});
+    if (activeModel === 'avg') {
+      wData.gpt = v; wData.gemini = v; wData.claude = v;
+    } else {
+      wData[activeModel] = v;
+    }
+    save(); render();
+    setTimeout(buildStickyHeader, 30);
+  };
+  inp.addEventListener('blur', commit);
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { inp.blur(); }
+    if (e.key === 'Escape') { committed = true; render(); }
+  });
 }
 
 // ═══════════════════════════════ FILTERS ═════════════════════════════════
